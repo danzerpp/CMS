@@ -39,6 +39,10 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
+    @Column(name = "is_deleted")
+    @Builder.Default
+    private int isDeleted = 0;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getName()));
