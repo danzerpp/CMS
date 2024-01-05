@@ -19,7 +19,7 @@ public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private long id;
 
     @Column(name = "category_id")
     private long  categoryId;
@@ -39,14 +39,18 @@ public class Recipe {
     @Column(name = "path_to_image")
     private String pathToImage;
 
-    @Column(name = "created_by_user_id")
-    private long createdByUserId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by_user_id", referencedColumnName = "id")
+    //@Column(name = "created_by_user_id")
+    private User createdByUserId;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
-    @Column(name = "edited_by_user_id")
-    private long editedByUserId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "edited_by_user_id", referencedColumnName = "id")
+    //@Column(name = "edited_by_user_id")
+    private User editedByUserId;
 
     @Column(name = "edited_date")
     private LocalDateTime editedDate;

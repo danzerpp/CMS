@@ -23,7 +23,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private long id;
 
     @Column(name = "fullname")
     private String fullName;
@@ -34,7 +34,6 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    //@Enumerated(EnumType.STRING)
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;

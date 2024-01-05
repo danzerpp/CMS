@@ -19,7 +19,7 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private long id;
 
     @Column(name = "name")
     private String name;
@@ -27,8 +27,9 @@ public class Category {
     @Column(name = "ordinal_no")
     private int ordinalNr;
 
-    @Column(name = "created_by")
-    private long createdBy;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by", referencedColumnName = "id")
+    private User createdBy;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;

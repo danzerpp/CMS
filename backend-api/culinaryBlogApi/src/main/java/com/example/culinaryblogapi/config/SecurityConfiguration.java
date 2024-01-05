@@ -42,6 +42,8 @@ public class SecurityConfiguration {
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
                                 .requestMatchers("/api/v1/auth/register").hasAuthority("ADMIN")
+                                .requestMatchers("/api/admin/users/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/admin/categories/**").hasAuthority("ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 )

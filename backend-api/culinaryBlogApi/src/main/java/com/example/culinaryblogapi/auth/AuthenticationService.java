@@ -1,12 +1,14 @@
 package com.example.culinaryblogapi.auth;
 
 import com.example.culinaryblogapi.config.JwtService;
-import com.example.culinaryblogapi.repository.RoleRepository;
 import com.example.culinaryblogapi.model.User;
+import com.example.culinaryblogapi.repository.RoleRepository;
 import com.example.culinaryblogapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +40,8 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    @SuppressWarnings("unchecked")
+    public <T> T authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -46,13 +49,17 @@ public class AuthenticationService {
                 )
         );
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
-        var jwtToken = jwtService.generateToken(user.getRole(), user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .email(user.getEmail())
-                .userId(user.getId())
-                .role(user.getRole().getName())
-                .build();
+                .orElseThrow(() -> new UsernameNotFoundException("User with email: " + request.getEmail() + " does not exist"));
+        if(user.getIsDeleted() == 1){
+            return (T) HttpStatus.NOT_FOUND;
+        } else {
+            var jwtToken = jwtService.generateToken(user.getRole(), user);
+            return (T) AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .email(user.getEmail())
+                    .userId(user.getId())
+                    .role(user.getRole().getName())
+                    .build();
+        }
     }
 }
