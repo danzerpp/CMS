@@ -50,4 +50,13 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
+//    @PostMapping("/changeOrder")
+//    public ResponseEntity<Category> changeOrder (
+//            @RequestBody Map<Integer, Integer> order
+//    ) {
+//        List<Category> categories = categoryService.getAll();
+//        categories.stream().
+//        category.setCreatedBy(userService.findUserById(category.getCreatedBy().getId()).orElseThrow());
+//        return ResponseEntity.ok(categoryService.addCategory(category));
+//    }
 }
