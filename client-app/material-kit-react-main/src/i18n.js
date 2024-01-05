@@ -14,7 +14,7 @@ function getCurrentLang(){
     }
 }
 
-    return 'pl';
+    return 'enn';
 }
 
 i18n
@@ -54,6 +54,13 @@ i18n
           "change-password":"Change password",
           "logout":"Sign out",
           "account":"Account",
+          "error-login" : "Wrong login or password",
+          "user-name" : "Fullname",
+          "user-email" : "Email",
+          "user-rolename" : "Role",
+          "button-save" : "Save",
+          "button-cancel" : "Cancel",
+          "user-select-rolename" : "Select role",
         },
       },
       pl: {
@@ -84,6 +91,13 @@ i18n
           "change-password":"Zmień hasło",
           "logout":"Wyloguj się",
           "account":"Konto użytkownika",
+          "error-login" : "Błędny login lub hasło",
+          "user-name" : "Imię i nazwisko",
+          "user-email" : "Email",
+          "user-rolename" : "Rola",
+          "user-select-rolename" : "Wybierz rolę",
+          "button-save" : "Zapisz",
+          "button-cancel" : "Anuluj",
         },
       }
     }

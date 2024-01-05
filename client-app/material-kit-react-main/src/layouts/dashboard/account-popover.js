@@ -18,6 +18,17 @@ export const AccountPopover = (props) => {
     },
     [onClose, auth, router]
   );
+  var user = {};
+try  
+{
+   user = JSON.parse(window.sessionStorage.getItem('authenticated_user'));
+
+}
+catch (err) 
+{
+  
+
+}
 
   return (
     <Popover
@@ -43,7 +54,7 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          Anika Visser
+          {user.email}
         </Typography>
       </Box>
       <Divider />

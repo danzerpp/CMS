@@ -21,7 +21,7 @@ export const items = [
   },
   {
     title: i18n.t("users"),
-    path: '/customers',
+    path: '/users',
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />

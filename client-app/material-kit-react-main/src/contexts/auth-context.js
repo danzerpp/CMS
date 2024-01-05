@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
+import i18n from 'src/i18n';
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -81,12 +82,8 @@ export const AuthProvider = (props) => {
     }
 
     if (isAuthenticated) {
-      const user = {
-        id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'Anika Visser',
-        email: 'anika.visser@devias.io'
-      };
+
+      const user = JSON.parse(window.sessionStorage.getItem('authenticated_user'));
 
       dispatch({
         type: HANDLERS.INITIALIZE,
@@ -128,10 +125,22 @@ export const AuthProvider = (props) => {
   };
 
   const signIn = async (email, password) => {
-    if (email !== 'demo@devias.io' || password !== 'Password123!') {
-      throw new Error('Please check your email and password');
-    }
+console.log(email)
+console.log(password)
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 'email': email, 'password': password})
+    };
 
+    var responseData ={};
+    var response = await fetch('http://localhost:8080/api/v1/auth/login', requestOptions)
+
+    if(response.status != 200)   
+      throw new Error(i18n.t("error-login"));
+
+      responseData = await response.json();  
+    
     try {
       window.sessionStorage.setItem('authenticated', 'true');
     } catch (err) {
@@ -139,11 +148,14 @@ export const AuthProvider = (props) => {
     }
 
     const user = {
-      id: '5e86809283e28b96d2d38537',
+      id: responseData.userId,
       avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Anika Visser',
-      email: 'anika.visser@devias.io'
+      name: responseData.email,
+      email: responseData.email,
+      token: responseData.token
     };
+
+    window.sessionStorage.setItem('authenticated_user', JSON.stringify(user));
 
     dispatch({
       type: HANDLERS.SIGN_IN,
@@ -156,6 +168,8 @@ export const AuthProvider = (props) => {
   };
 
   const signOut = () => {
+      window.sessionStorage.setItem('authenticated', 'false');
+    window.sessionStorage.setItem('authenticated_user', '');
     dispatch({
       type: HANDLERS.SIGN_OUT
     });

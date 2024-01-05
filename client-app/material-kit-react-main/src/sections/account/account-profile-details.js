@@ -1,4 +1,7 @@
 import { useCallback, useState } from 'react';
+
+import { useTranslation }  from "react-i18next";
+
 import {
   Box,
   Button,
@@ -13,31 +16,23 @@ import {
 
 const states = [
   {
-    value: 'alabama',
-    label: 'Alabama'
+    value: 'ADMIN',
+    label: 'ADMIN'
   },
   {
-    value: 'new-york',
-    label: 'New York'
-  },
-  {
-    value: 'san-francisco',
-    label: 'San Francisco'
-  },
-  {
-    value: 'los-angeles',
-    label: 'Los Angeles'
+    value: 'USER',
+    label: 'USER'
   }
 ];
 
 export const AccountProfileDetails = () => {
+  const { i18n, t } = useTranslation();
+  
   const [values, setValues] = useState({
-    firstName: 'Anika',
-    lastName: 'Visser',
+    fullname: 'Anika',
+    password: 'Visser',
     email: 'demo@devias.io',
-    phone: '',
-    state: 'los-angeles',
-    country: 'USA'
+    role: ''
   });
 
   const handleChange = useCallback(
@@ -80,9 +75,8 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  helperText="Please specify the first name"
-                  label="First name"
-                  name="firstName"
+                  label= {t("user-name")}
+                  name="fullname"
                   onChange={handleChange}
                   required
                   value={values.firstName}
@@ -94,47 +88,22 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="Last name"
-                  name="lastName"
+                  label={t("password")}
+                  name="password"
                   onChange={handleChange}
                   required
                   value={values.lastName}
                 />
               </Grid>
+            
               <Grid
                 xs={12}
                 md={6}
               >
                 <TextField
                   fullWidth
-                  label="Email Address"
+                  label={t("address-email")}
                   name="email"
-                  onChange={handleChange}
-                  required
-                  value={values.email}
-                />
-              </Grid>
-              <Grid
-                xs={12}
-                md={6}
-              >
-                <TextField
-                  fullWidth
-                  label="Phone Number"
-                  name="phone"
-                  onChange={handleChange}
-                  type="number"
-                  value={values.phone}
-                />
-              </Grid>
-              <Grid
-                xs={12}
-                md={6}
-              >
-                <TextField
-                  fullWidth
-                  label="Country"
-                  name="country"
                   onChange={handleChange}
                   required
                   value={values.country}
@@ -146,8 +115,8 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="Select State"
-                  name="state"
+                  label= {t("user-select-rolename")}
+                  name="role"
                   onChange={handleChange}
                   required
                   select

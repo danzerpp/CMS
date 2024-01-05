@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { format } from 'date-fns';
+import { DataGrid } from '@mui/x-data-grid'
 import {
   Avatar,
   Box,
@@ -12,7 +13,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography
+  Typography,
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { getInitials } from 'src/utils/get-initials';
@@ -39,7 +40,7 @@ export const CustomersTable = (props) => {
     <Card>
       <Scrollbar>
         <Box sx={{ minWidth: 800 }}>
-          <Table>
+          <Table >
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
