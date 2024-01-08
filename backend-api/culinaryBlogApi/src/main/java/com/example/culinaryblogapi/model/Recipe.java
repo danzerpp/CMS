@@ -22,7 +22,7 @@ public class Recipe {
     private long id;
 
     @Column(name = "category_id")
-    private long  categoryId;
+    private long categoryId;
 
     @Column(name = "ordinal_no")
     private int ordinalNr;
@@ -41,19 +41,20 @@ public class Recipe {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by_user_id", referencedColumnName = "id")
-    //@Column(name = "created_by_user_id")
     private User createdByUserId;
 
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    @Builder.Default
+    private LocalDateTime createdDate = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "edited_by_user_id", referencedColumnName = "id")
-    //@Column(name = "edited_by_user_id")
-    private User editedByUserId;
+    @Builder.Default
+    private User editedByUserId = null;
 
     @Column(name = "edited_date")
-    private LocalDateTime editedDate;
+    @Builder.Default
+    private LocalDateTime editedDate = null;
 
     @Column(name = "is_visible")
     private int isVisible;
