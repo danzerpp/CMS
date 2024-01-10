@@ -17,6 +17,7 @@ const user = {
   name: 'Anika Visser',
   timezone: 'GTM-7'
 };
+import i18n from "i18next";
 
 export const AccountProfile = () => (
   <Card>
@@ -62,7 +63,7 @@ export const AccountProfile = () => (
         fullWidth
         variant="text"
       >
-        Upload picture
+       { i18n.t("upload-picture")}
       </Button>
     </CardActions>
   </Card>

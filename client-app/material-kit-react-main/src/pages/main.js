@@ -1,45 +1,135 @@
-import Head from 'next/head';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import {
-  Box,
-  Button,
-  Container,
-  Pagination,
-  Stack,
-  SvgIcon,
-  Typography,
-  Unstable_Grid2 as Grid
-} from '@mui/material';
-import { Layout as AuthLayout } from 'src/layouts/main/layout';
-import { CompanyCard } from 'src/sections/companies/company-card';
-import { CompaniesSearch } from 'src/sections/companies/companies-search';
 
-import { DataGrid } from '@mui/x-data-grid';
+import { Layout as MainLayout } from 'src/layouts/main/layout';
+
+import { useEffect,useMemo } from 'react';
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from 'material-react-table';
+
+//nested data is ok, see accessorKeys in ColumnDef below
+const data = [
+  {
+    name: {
+      firstName: 'John',
+      lastName: 'Doe',
+    },
+    address: '261 Erdman Ford',
+    city: 'East Daphne',
+    state: 'Kentucky',
+  },
+  {
+    name: {
+      firstName: 'Jane',
+      lastName: 'Doe',
+    },
+    address: '769 Dominic Grove',
+    city: 'Columbus',
+    state: 'Ohio',
+  },
+  {
+    name: {
+      firstName: 'Joe',
+      lastName: 'Doe',
+    },
+    address: '566 Brakus Inlet',
+    city: 'South Linda',
+    state: 'West Virginia',
+  },
+  {
+    name: {
+      firstName: 'Kevin',
+      lastName: 'Vandy',
+    },
+    address: '722 Emie Stream',
+    city: 'Lincoln',
+    state: 'Nebraska',
+  },
+  {
+    name: {
+      firstName: 'Joshua',
+      lastName: 'Rolluffs',
+    },
+    address: '32188 Larkin Turnpike',
+    city: 'Charleston',
+    state: 'South Carolina',
+  },
+];
+
+
+
 const Page = () =>
 {
-  const rows = [
-    { id: 1, col1: 'Hello', col2: 'World' },
-    { id: 2, col1: 'DataGridPro', col2: 'is Awesome' },
-    { id: 3, col1: 'MUI', col2: 'is Amazing' },
-  ];
-  
-  const columns = [
-    { field: 'col1', headerName: 'Column 1', width: 150 },
-    { field: 'col2', headerName: 'Column 2', width: 150 },
-  ];
-  
- return(
-  <div style={{ height: 300, width: '100%' }}>
-      <DataGrid rows={rows} columns={columns} />
-    </div>
-)};
+   
+
+    useEffect( ()=> {
+
+      async function fetchMyAPI() {
+
+        var options = {  
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+          }
+        }
+
+        const URL = 'http://localhost:8080/api/admin/users'
+        const headers = { 'Authorization': 'Bearer ' + window.sessionStorage.getItem('token') };
+        console.log(headers);
+         var response = await fetch(URL, options)
+        console.log(await response.json())
+      }
+      fetchMyAPI();
+    },[]) // empty array means it only run once
+
+
+
+  //should be memoized or stable
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'name.firstName', //access nested data with dot notation
+        header: 'First Name',
+        size: 150,
+      },
+      {
+        accessorKey: 'name.lastName',
+        header: 'Last Name',
+        size: 150,
+      },
+      {
+        accessorKey: 'address', //normal accessorKey
+        header: 'Address',
+        size: 200,
+      },
+      {
+        accessorKey: 'city',
+        header: 'City',
+        size: 150,
+      },
+      {
+        accessorKey: 'state',
+        header: 'State',
+        size: 150,
+      },
+    ],
+    [],
+  );
+
+  const table = useMaterialReactTable({
+    columns,
+    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+  });
+
+  return <MaterialReactTable table={table} />;
+};
 
 Page.getLayout = (page) => (
-  <AuthLayout>
+  <MainLayout>
     {page}
-  </AuthLayout>
+  </MainLayout>
 );
 
 export default Page;

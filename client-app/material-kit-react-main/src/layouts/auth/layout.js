@@ -1,13 +1,34 @@
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
-import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
+import { Button, Avatar,Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Logo } from 'src/components/logo';
 import i18n from "i18next";
+
+
 
 // TODO: Change subtitle text
 
 export const Layout = (props) => {
   const { children } = props;
+  const logo = require('/src/flag.png'); // with require
+  var language = localStorage.getItem('app_language');
+  if( language === undefined)
+    language ='pl';
+
+  function changeLanguage(){
+    var language = localStorage.getItem('app_language')
+    if(language === undefined || !language)
+    {
+      localStorage.setItem('app_language','en')
+    }
+    else 
+    {
+      localStorage.setItem('app_language',language === 'pl' ? 'en': 'pl')
+
+    }
+    window.location.reload();
+  }
+
   return (
     <Box
       component="main"
@@ -51,6 +72,17 @@ export const Layout = (props) => {
             >
               <Logo />
             </Box>
+
+              <div className='changeLanguageBtn'>
+                
+                <Button
+                onClick={changeLanguage}
+                startIcon = {<Avatar src={language === 'pl' ? '/images/united-kingdom.png' : '/images/flag.png'} width={25} height={25} />}
+                >
+
+                </Button>
+              </div>
+
           </Box>
           {children}
         </Grid>

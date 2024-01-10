@@ -146,6 +146,7 @@ console.log(password)
     } catch (err) {
       console.error(err);
     }
+    window.sessionStorage.setItem('token', responseData.token);
 
     const user = {
       id: responseData.userId,

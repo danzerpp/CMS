@@ -46,5 +46,15 @@ export const items = [
       </SvgIcon>
     )
   }
+  ,
+  {
+    title: i18n.t("main-page-route"),
+    path: '/main',
+    icon: (
+      <SvgIcon fontSize="small">
+        <UserIcon />
+      </SvgIcon>
+    )
+  }
 ];
 

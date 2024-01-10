@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import { format } from 'date-fns';
-import { DataGrid } from '@mui/x-data-grid'
 import {
   Avatar,
   Box,

@@ -6,15 +6,18 @@ function getCurrentLang(){
     var language = 'pl';
 
     if (typeof window !== 'undefined') {
-    var language = localStorage.getItem('app_language')
+     language = localStorage.getItem('app_language')
+ 
     if(language === undefined || !language)
     {
         language = 'pl'
         localStorage.setItem('app_language',language)
     }
+
+
 }
 
-    return 'enn';
+    return language;
 }
 
 i18n
@@ -61,6 +64,10 @@ i18n
           "button-save" : "Save",
           "button-cancel" : "Cancel",
           "user-select-rolename" : "Select role",
+          "add" : "Add",
+          "upload-picture" : "Upload picture",
+          "return" : "Go back",
+          "main-page-route" : "Show page with recipes",
         },
       },
       pl: {
@@ -98,6 +105,10 @@ i18n
           "user-select-rolename" : "Wybierz rolę",
           "button-save" : "Zapisz",
           "button-cancel" : "Anuluj",
+          "add" : "dodaj",
+          "upload-picture" : "Załaduj zdjęcie",
+          "return" : "Wróć",
+          "main-page-route" : "Wyświetl stronę z przepisami",
         },
       }
     }
