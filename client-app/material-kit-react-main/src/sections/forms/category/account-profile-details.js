@@ -11,17 +11,19 @@ import {
   CardHeader,
   Divider,
   TextField,
-  Unstable_Grid2 as Grid
+  Unstable_Grid2 as Grid,
+  Checkbox,
+  FormControlLabel
 } from '@mui/material';
 
 const states = [
   {
-    value: 1,
+    value: 'ADMIN',
     label: 'ADMIN'
   },
   {
-    value: 2,
-    label: 'CHEF'
+    value: 'USER',
+    label: 'USER'
   }
 ];
 
@@ -29,10 +31,8 @@ export const AccountProfileDetails = () => {
   const { i18n, t } = useTranslation();
   
   const [values, setValues] = useState({
-    fullname: 'Anika',
-    password: 'Visser',
-    email: 'demo@devias.io',
-    role: ''
+    name: '',
+    isVisible: true
   });
 
   const handleChange = useCallback(
@@ -59,10 +59,7 @@ export const AccountProfileDetails = () => {
       onSubmit={handleSubmit}
     >
       <Card>
-        <CardHeader
-          subheader="The information can be edited"
-          title="Profile"
-        />
+       
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
             <Grid
@@ -75,72 +72,41 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label= {t("title")}
-                  name="fullname"
+                  label= {t("name")}
+                  name="name"
                   onChange={handleChange}
                   required
-                  value={values.firstName}
+                  value={values.name}
                 />
               </Grid>
               <Grid
                 xs={12}
                 md={6}
               >
-                <TextField
+                
+                <FormControlLabel control={
+                
+                <Checkbox
                   fullWidth
-                  label={t("password")}
-                  name="password"
+                  label={t("is-visible")}
+                  name="isVisible"
                   onChange={handleChange}
-                  type='password'
                   required
-                  value={values.lastName}
+                  checked={values.isVisible}
                 />
+
+                }
+                 label={t("is-visible")}/>
               </Grid>
             
-              <Grid
-                xs={12}
-                md={6}
-              >
-                <TextField
-                  fullWidth
-                  label={t("address-email")}
-                  name="email"
-                  onChange={handleChange}
-                  required
-                  value={values.country}
-                />
-              </Grid>
-              <Grid
-                xs={12}
-                md={6}
-              >
-                <TextField
-                  fullWidth
-                  label= {t("user-select-rolename")}
-                  name="role"
-                  onChange={handleChange}
-                  required
-                  select
-                  SelectProps={{ native: true }}
-                  value={values.state}
-                >
-                  {states.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </TextField>
-              </Grid>
+             
             </Grid>
           </Box>
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
           <Button variant="contained">
-          {t("save")}
+            {t("save")}
           </Button>
         </CardActions>
       </Card>

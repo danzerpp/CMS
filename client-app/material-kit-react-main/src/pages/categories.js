@@ -1,29 +1,28 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
 import Head from 'next/head';
-import { subDays, subHours } from 'date-fns';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
-import { useSelection } from 'src/hooks/use-selection';
+import {
+  Box,
+  Button,
+  Container,
+  Pagination,
+  Stack,
+  SvgIcon,
+  Typography,
+  Unstable_Grid2 as Grid
+} from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { CustomersTable } from 'src/sections/customer/customers-table';
-import { CustomersSearch } from 'src/sections/customer/customers-search';
-import { applyPagination } from 'src/utils/apply-pagination';
-import {usert} from 'src/i18n'
 import { useTranslation }  from "react-i18next";
+import { useRouter } from 'next/navigation';
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
-import { useRouter } from 'next/navigation';
-
+import { useCallback, useMemo, useState, useEffect } from 'react';
 
 const Page = () => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const {t} = useTranslation();
-  const [usersData, setUsersData] = useState([]);
+  const [data, setData] = useState([]);
   const router = useRouter();
 
   const handlePageChange = useCallback(
@@ -33,6 +32,13 @@ const Page = () => {
     []
   );
 
+  function compareDecimals(a, b) {
+    if (a.ordinalNr === b.ordinalNr) 
+         return 0;
+
+    return a.ordinalNr - b.ordinalNr;
+}
+
   async function fetchApiData() {
 
     var options = {  
@@ -40,15 +46,16 @@ const Page = () => {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Content-Type': 'application/json',
         'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
       }
     }
 
-    const URL = 'http://localhost:8080/api/admin/users'
+    const URL = 'http://localhost:8080/api/admin/categories'
      var response = await fetch(URL, options)
     var bodyData = await response.json()
-    setUsersData(bodyData);
+    bodyData.sort(compareDecimals )
+    console.log(bodyData);
+    setData(bodyData);
   };
 
   useEffect(() => {
@@ -60,9 +67,9 @@ const Page = () => {
 function goToAddForm()
 {
   router.push({
-    pathname: '/forms/user/add',
+    pathname: '/forms/category/add',
     query: { userId: 1 }
-}, '/forms/user/add')
+}, '/forms/category/add')
     
   
 }
@@ -72,20 +79,26 @@ function goToAddForm()
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'fullName', //access nested data with dot notation
-        header: t("user-name"),
-        size: 150,
+        accessorKey: 'name', //access nested data with dot notation
+        header: t("name"),
       },
       {
-        accessorKey: 'username',
-        header: t("user-email"),
-        size: 150,
-      }
-      ,
+        accessorKey: 'isVisible', //access nested data with dot notation
+        header: t("is-visible"),
+        Cell: ({ cell }) => (
+          <span>{cell.getValue() === 1 ? 'Tak': 'Nie'}</span>
+        ),
+      },
       {
-        accessorKey: 'role.name', //normal accessorKey
-        header: t("user-rolename"),
-        size: 200,
+        accessorKey: 'id',
+        header: '',
+        Cell: ({ cell }) => (
+          <div>
+              <Button>Edytuj</Button>
+          <Button>Usuń</Button>
+          </div>
+        
+        ),
       }
     ],
     [],
@@ -93,8 +106,10 @@ function goToAddForm()
 
 
   const table = useMaterialReactTable({
-   
-    data:usersData,
+   enableSorting:false,
+   enableFilters:false,
+   enableRowOrdering:true,
+    data:data,
     columns,
   });
 
@@ -102,7 +117,7 @@ function goToAddForm()
     <>
       <Head>
         <title>
-        {t("users")}
+        {t("categories")}
         </title>
       </Head>
       <Box
@@ -121,7 +136,7 @@ function goToAddForm()
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  {t("users")}
+                  {t("categories")}
                 </Typography>
               </Stack>
               <div>
@@ -138,13 +153,14 @@ function goToAddForm()
                 </Button>
               </div>
             </Stack>
-            <MaterialReactTable table={table} />
+            <MaterialReactTable table={table}  />
           </Stack>
         </Container>
       </Box>
     </>
   );
 };
+
 
 Page.getLayout = (page) => (
   <DashboardLayout>

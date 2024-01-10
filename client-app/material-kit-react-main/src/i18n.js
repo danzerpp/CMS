@@ -31,7 +31,7 @@ i18n
     resources: {
       en: {
         translation: {
-          title: "Multi-language app",
+          title: "Title",
           label: "Select another language!",
           about: "About",
           home: "Home",
@@ -68,11 +68,19 @@ i18n
           "upload-picture" : "Upload picture",
           "return" : "Go back",
           "main-page-route" : "Show page with recipes",
+          "is-visible" : "Is visible",
+          "name" : "Name",
+          "save": "Save",
+          "edit": "Edit",
+          "delete": "Delete",
+          "recipes-select-category": "Select category",
+          "description": "Description",
+          "calories": "Calories",
         },
       },
       pl: {
         translation: {
-          title: "MULTI PART po polsku baybe",
+          title: "Tytuł",
           label: "Selecciona otro lenguaje!",
           about: "Sobre mí",
           home: "Strona domowa",
@@ -105,10 +113,18 @@ i18n
           "user-select-rolename" : "Wybierz rolę",
           "button-save" : "Zapisz",
           "button-cancel" : "Anuluj",
-          "add" : "dodaj",
+          "add" : "Dodaj",
           "upload-picture" : "Załaduj zdjęcie",
           "return" : "Wróć",
           "main-page-route" : "Wyświetl stronę z przepisami",
+          "is-visible" : "Widoczne",
+          "name" : "Nazwa",
+          "save": "Zapisz",
+          "edit": "Edytuj",
+          "delete": "Usuń",
+          "recipes-select-category": "Wybierz kategorię",
+          "description": "Opis",
+          "calories": "Kalorie",
         },
       }
     }

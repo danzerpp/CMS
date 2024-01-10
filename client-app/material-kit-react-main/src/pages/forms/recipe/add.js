@@ -45,7 +45,7 @@ return(
       </Button>
     <Head>
       <title>
-        {t("users")} | {t("add")}
+        {t("recipes")} | {t("add")}
       </title>
     </Head>
     <Box
@@ -59,7 +59,7 @@ return(
         <Stack spacing={3}>
           <div>
             <Typography variant="h4">
-            {t("users")}
+            {t("recipes")}
             </Typography>
           </div>
           <div>

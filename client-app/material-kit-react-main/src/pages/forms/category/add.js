@@ -1,14 +1,37 @@
 import Head from 'next/head';
 import { Box, Container, Stack, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { AccountProfile } from 'src/sections/account/account-profile';
-import { AccountProfileDetails } from 'src/sections/account/account-profile-details';
+import { AccountProfileDetails } from 'src/sections/forms/category/account-profile-details';
+import { useTranslation }  from "react-i18next";
+import { withRouter } from 'next/router'
+import {
+    Button,
+  
+  } from '@mui/material';
+import { useRouter } from 'next/navigation';
+const Page = (props) =>{
+    const {t} = useTranslation();
+    console.log(props.router.query.name);
+    const router = useRouter();
 
-const Page = () => (
+    function goBackToPage()
+    {
+        router.push("/categories")
+    }
+
+return(
   <>
+  <Button
+        fullWidth
+        variant="text"
+        maxWidth ="50px"
+        onClick={goBackToPage}
+      >
+       {t("return")}
+      </Button>
     <Head>
       <title>
-        Account | Devias Kit
+        {t("categories")} | {t("add")}
       </title>
     </Head>
     <Box
@@ -22,7 +45,7 @@ const Page = () => (
         <Stack spacing={3}>
           <div>
             <Typography variant="h4">
-              Account
+            {t("categories")}
             </Typography>
           </div>
           <div>
@@ -30,13 +53,7 @@ const Page = () => (
               container
               spacing={3}
             >
-              <Grid
-                xs={12}
-                md={6}
-                lg={4}
-              >
-                <AccountProfile />
-              </Grid>
+              
               <Grid
                 xs={12}
                 md={6}
@@ -51,11 +68,11 @@ const Page = () => (
     </Box>
   </>
 );
-
+    }
 Page.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
 );
 
-export default Page;
+export default withRouter (Page);

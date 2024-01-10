@@ -7,6 +7,8 @@ import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import XCircleIcon from '@heroicons/react/24/solid/XCircleIcon';
 import { SvgIcon } from '@mui/material';
+import { GridLoadIcon, GridMenuIcon } from '@mui/x-data-grid';
+import { CalendarIcon } from '@mui/x-date-pickers';
 import i18n from 'src/i18n';
 
 export const items = [
@@ -30,7 +32,7 @@ export const items = [
   },
   {
     title: i18n.t("categories"),
-    path: '/companies',
+    path: '/categories',
     icon: (
       <SvgIcon fontSize="small">
         <ShoppingBagIcon />
@@ -39,7 +41,7 @@ export const items = [
   },
   {
     title: i18n.t("recipes"),
-    path: '/account',
+    path: '/recipes',
     icon: (
       <SvgIcon fontSize="small">
         <UserIcon />
@@ -52,7 +54,7 @@ export const items = [
     path: '/main',
     icon: (
       <SvgIcon fontSize="small">
-        <UserIcon />
+        <GridMenuIcon />
       </SvgIcon>
     )
   }
