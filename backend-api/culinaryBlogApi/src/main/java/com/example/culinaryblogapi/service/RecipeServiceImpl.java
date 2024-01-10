@@ -39,4 +39,9 @@ public class RecipeServiceImpl implements RecipeService{
     public Optional<Recipe> findRecipeById(long recipeId) {
         return recipeRespository.findRecipeById(recipeId);
     }
+
+    @Override
+    public List<Recipe> getAllByCategoryId(long categoryId) {
+        return recipeRespository.findAllByCategoryId(categoryId);
+    }
 }

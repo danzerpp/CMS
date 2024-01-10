@@ -15,4 +15,6 @@ public interface RecipeService {
     Recipe save(Recipe recipe);
 
     Optional<Recipe> findRecipeById(long recipeId);
+
+    List<Recipe> getAllByCategoryId(long categoryId);
 }
