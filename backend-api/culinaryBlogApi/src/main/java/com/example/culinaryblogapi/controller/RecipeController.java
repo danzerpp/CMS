@@ -42,7 +42,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.addRecipe(recipe));
     }
 
-    @PostMapping("/uploadImage")
+    @PostMapping(value = "/uploadImage", consumes = "application/json")
     public ResponseEntity<?> uploadImage (
             @ModelAttribute ImageRequestBody imageRequestBody
     ) {
