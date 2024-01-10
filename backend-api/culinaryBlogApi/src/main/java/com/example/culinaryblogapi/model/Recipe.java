@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -38,6 +39,9 @@ public class Recipe {
 
     @Column(name = "path_to_image")
     private String pathToImage;
+
+    @ManyToMany(cascade=CascadeType.ALL)
+    private List<Ingredient> ingredients;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by_user_id", referencedColumnName = "id")

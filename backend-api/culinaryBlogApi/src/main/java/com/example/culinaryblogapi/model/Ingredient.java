@@ -30,4 +30,7 @@ public class Ingredient {
 
     @Column(name = "quantity")
     private double quantity;
+
+    @Column(name = "ordinal_no")
+    private int ordinalNr;
 }

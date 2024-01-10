@@ -1,5 +1,5 @@
 INSERT INTO roles (name) VALUES ('ADMIN');
-INSERT INTO roles (name) VALUES ('USER');
+INSERT INTO roles (name) VALUES ('CHEF');
 INSERT INTO users (role_id, email, fullName, password, is_deleted) VALUES (1, 'kacper@kacper.pl', 'Kacper Cichosz', '$2a$10$orkAidb.4nZLKWadbPuW1.I.DaFmVzgbjeJ6ex9sCehh/W1HlKriG', 0);
 INSERT INTO users (role_id, email, fullName, password, is_deleted) VALUES (1, 'dominik@dominik.pl', 'Dominik Dziabias', '$2a$10$fE5o7.sUCa2NChK68mLQ/ePoiX0TN.UrAXkl6Dg5INhJtTc0c6q.W', 0);
 INSERT INTO users (role_id, email, fullName, password, is_deleted) VALUES (2, 'kacper2@kacper.pl', 'Kacper Cichosz', '$2a$10$orkAidb.4nZLKWadbPuW1.I.DaFmVzgbjeJ6ex9sCehh/W1HlKriG', 0);
@@ -22,3 +22,15 @@ INSERT INTO units (id, name) VALUES (3, 'miligramy');
 INSERT INTO units (id, name) VALUES (4, 'mililitry');
 INSERT INTO units (id, name) VALUES (5, 'litry');
 INSERT INTO units (id, name) VALUES (6, 'dekagramy');
+
+INSERT INTO categories (id, name, ordinal_no, created_by, created_date, is_visible) VALUES (1, 'kuchnia włoska', 1, 1, NOW(), 1);
+
+INSERT INTO recipes (id, category_id, ordinal_no, title, description, calories, path_to_image, created_by_user_id, created_date, is_visible) VALUES(1, 1, 1, 'Przepis na makaron', 'Bardzo prosty przepis w 10 minut', 100, 'resources/static/image/123.jpg', 1, NOW() ,1);
+
+INSERT INTO ingredients (id, recipe_id, product_id, unit_id, quantity, ordinal_no) VALUES (1, 1, 1, 1, 10, 1);
+
+insert into recipes_ingredients
+select r.id, i.id
+from   recipes r
+           left join lateral (select id from ingredients where id in (1)) i on true
+where  r.id in (1);
