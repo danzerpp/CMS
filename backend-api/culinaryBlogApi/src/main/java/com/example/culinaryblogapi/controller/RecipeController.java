@@ -137,12 +137,13 @@ public class RecipeController {
     public ResponseEntity<List<RecipeDto>> getAllRecipes (
             @RequestBody(required=false) String title
     ) throws IOException {
+        // dodac categoryId
         List<Recipe> recipes;
         final String authHeader = request.getHeader("Authorization");
         String jwt = authHeader.substring(7);
         String userEmail = jwtService.extractUsername(jwt);
         UserDetails details = userDetailsService.loadUserByUsername(userEmail);
-        User user = (User) userService.findUserByEmail(details.getUsername());
+        User user = userService.findUserByEmail(details.getUsername()).get(0);
         boolean isAdminRequest = false;
         if (details != null && details.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ADMIN"))) {

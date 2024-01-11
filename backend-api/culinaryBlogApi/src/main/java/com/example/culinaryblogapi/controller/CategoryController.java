@@ -5,14 +5,15 @@ import com.example.culinaryblogapi.model.Category;
 import com.example.culinaryblogapi.service.CategoryService;
 import com.example.culinaryblogapi.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/categories")
@@ -25,7 +26,9 @@ public class CategoryController {
     @Autowired
     private UserService userService;
 
-    private final UserDetailsService userDetailsService;
+    @Autowired
+    private ModelMapper modelMapper;
+
 
     @PostMapping("/add")
     public ResponseEntity<?> add (
@@ -63,8 +66,12 @@ public class CategoryController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Category>> getAllCategories () {
-        return ResponseEntity.ok(categoryService.getAll());
+    public ResponseEntity<List<CategoryDto>> getAllCategories () {
+        List<Category> categories = categoryService.getAll();
+        List<CategoryDto> categoryDtos = categories.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(categoryDtos);
     }
 
 //    @PostMapping("/changeOrder")
@@ -76,4 +83,10 @@ public class CategoryController {
 //        category.setCreatedBy(userService.findUserById(category.getCreatedBy().getId()).orElseThrow());
 //        return ResponseEntity.ok(categoryService.addCategory(category));
 //    }
+
+    private CategoryDto convertToDto(Category category) {
+        CategoryDto categoryDto = modelMapper.map(category, CategoryDto.class);
+        categoryDto.setCreatedByUserId(category.getId());
+        return categoryDto;
+    }
 }

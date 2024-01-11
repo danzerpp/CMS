@@ -2,6 +2,7 @@ package com.example.culinaryblogapi.controller;
 
 import com.example.culinaryblogapi.dto.UserDto;
 import com.example.culinaryblogapi.model.User;
+import com.example.culinaryblogapi.requestBody.ChangePasswordRequest;
 import com.example.culinaryblogapi.service.RoleService;
 import com.example.culinaryblogapi.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -68,11 +69,24 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not exist");
         }
+    }
 
+    @PutMapping("/changePassword")
+    public ResponseEntity<?> changePassword (
+            @RequestBody ChangePasswordRequest changePasswordRequest
+            ) {
+        if(userService.findUserById(changePasswordRequest.getUserId()).isPresent()){
+            var user = userService.findUserById(changePasswordRequest.getUserId()).get();
+            user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
+            return ResponseEntity.ok(userService.save(user));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not exist");
+        }
     }
 
     @GetMapping("")
     public ResponseEntity<List<User>> getAllUsers () {
+        //
         return ResponseEntity.ok(userService.getAll());
     }
 
