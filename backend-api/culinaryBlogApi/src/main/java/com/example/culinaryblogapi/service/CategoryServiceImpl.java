@@ -38,4 +38,9 @@ public class CategoryServiceImpl implements CategoryService {
     public Category findCategoryById(long id) {
         return categoryRepository.findCategoryById(id);
     }
+
+    @Override
+    public Category findCategoryByName(String name) {
+        return categoryRepository.findCategoryByName(name);
+    }
 }

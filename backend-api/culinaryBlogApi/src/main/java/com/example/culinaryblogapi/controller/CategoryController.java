@@ -6,6 +6,7 @@ import com.example.culinaryblogapi.service.CategoryService;
 import com.example.culinaryblogapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
@@ -27,16 +28,20 @@ public class CategoryController {
     private final UserDetailsService userDetailsService;
 
     @PostMapping("/add")
-    public ResponseEntity<Category> add (
+    public ResponseEntity<?> add (
             @RequestBody CategoryDto categoryDto
     ) {
-        return ResponseEntity.ok(categoryService.addCategory(Category.builder()
-                .createdBy(userService.findUserById(categoryDto.getCreatedByUserId()).orElseThrow())
-                .name(categoryDto.getName())
-                .ordinalNr(categoryDto.getOrdinalNr())
-                .isVisible(categoryDto.getIsVisible())
-                .createdDate(LocalDateTime.now())
-                .build()));
+        if(categoryService.findCategoryByName(categoryDto.getName()) != null) {
+            return ResponseEntity.ok(categoryService.addCategory(Category.builder()
+                    .createdBy(userService.findUserById(categoryDto.getCreatedByUserId()).orElseThrow())
+                    .name(categoryDto.getName())
+                    .ordinalNr(categoryDto.getOrdinalNr())
+                    .isVisible(categoryDto.getIsVisible())
+                    .createdDate(LocalDateTime.now())
+                    .build()));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category with name: " + categoryDto.getName() + " already exist!");
+        }
     }
 
     @DeleteMapping("/remove/{categoryId}")

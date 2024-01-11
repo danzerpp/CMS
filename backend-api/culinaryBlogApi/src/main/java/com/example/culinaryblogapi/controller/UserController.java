@@ -40,7 +40,7 @@ public class UserController {
                     .build();
             return ResponseEntity.ok(userService.save(user));
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with email: " + userDto.getEmail() + " already exist!");
         }
     }
 
@@ -57,15 +57,18 @@ public class UserController {
     public ResponseEntity<?> edit (
             @PathVariable long userId, @RequestBody UserDto userDto
     ) {
-        var user = userService.findUserById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        //sourceUser.setRole(roleService.findByName(sourceUser.getRole().getName()).orElseThrow());
-        //BeanUtils.copyProperties(sourceUser, targetUser, "id", "password");
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRole(roleService.findById(userDto.getRoleId()).orElseThrow());
-        user.setEmail(userDto.getEmail());
-        user.setFullName(userDto.getFullName());
-        user.setIsDeleted(userDto.getIsVisible());
-        return ResponseEntity.ok(userService.save(user));
+        if(userService.findUserById(userId).isPresent()){
+            var user = userService.findUserById(userId).get();
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            user.setRole(roleService.findById(userDto.getRoleId()).orElseThrow());
+            user.setEmail(userDto.getEmail());
+            user.setFullName(userDto.getFullName());
+            user.setIsDeleted(userDto.getIsVisible());
+            return ResponseEntity.ok(userService.save(user));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not exist");
+        }
+
     }
 
     @GetMapping("")
