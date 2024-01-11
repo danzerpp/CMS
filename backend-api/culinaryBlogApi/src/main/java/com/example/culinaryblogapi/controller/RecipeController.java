@@ -133,7 +133,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.save(recipe));
     }
 
-    @GetMapping(value="", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value="", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RecipeDto>> getAllRecipes (
             @RequestBody RecipeByTitleAndCategoryIdRequest recipeByTitleAndCategoryIdRequest
     ) throws IOException {
