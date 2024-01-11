@@ -74,6 +74,11 @@ public class CategoryController {
         return ResponseEntity.ok(categoryDtos);
     }
 
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<Category> getCategoryById (@PathVariable long categoryId) {
+        return ResponseEntity.ok(categoryService.findCategoryById(categoryId));
+    }
+
 //    @PostMapping("/changeOrder")
 //    public ResponseEntity<Category> changeOrder (
 //            @RequestBody Map<Integer, Integer> order

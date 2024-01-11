@@ -161,10 +161,9 @@ public class RecipeController {
         return ResponseEntity.ok(convertRecipeToDTO(recipes));
     }
 
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<List<RecipeDto>> getAllRecipesByCategoryId(@PathVariable long categoryId) throws IOException {
-        List<Recipe> recipes = recipeService.getAllByCategoryId(categoryId);
-        return ResponseEntity.ok(convertRecipeToDTO(recipes));
+    @GetMapping("/{recipeId}")
+    public ResponseEntity<Recipe> getAllRecipesByRecipeId(@PathVariable long recipeId) throws IOException {
+        return ResponseEntity.ok(recipeService.findRecipeById(recipeId).get());
     }
 
     public List<RecipeDto> convertRecipeToDTO(List<Recipe> recipes) throws IOException {
