@@ -19,14 +19,17 @@ public class Ingredient {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "recipe_id")
-    private long recipeId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
+    private Recipe recipe;
 
-    @Column(name = "product_id")
-    private long productId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private Product product;
 
-    @Column(name = "unit_id")
-    private long unitId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "unit_id", referencedColumnName = "id")
+    private Unit unit;
 
     @Column(name = "quantity")
     private double quantity;

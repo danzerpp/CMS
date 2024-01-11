@@ -1,7 +1,7 @@
 package com.example.culinaryblogapi.controller;
 
 import com.example.culinaryblogapi.dto.CategoryDto;
-import com.example.culinaryblogapi.dto.IngredientDto;
+import com.example.culinaryblogapi.dto.IngredientDtoForHome;
 import com.example.culinaryblogapi.dto.RecipeDtoForHome;
 import com.example.culinaryblogapi.model.Category;
 import com.example.culinaryblogapi.model.Ingredient;
@@ -66,18 +66,39 @@ public class HomeController {
     public ResponseEntity<List<RecipeDtoForHome>> getAllRecipes (
             @RequestBody RecipeByTitleAndCategoryIdRequest recipeByTitleAndCategoryIdRequest
     )  throws IOException {
-//        if(recipeByTitleAndCategoryIdRequest.getTitle() == null){
-//            List<Recipe> recipes = recipeService.getAllByCategoryId(recipeByTitleAndCategoryIdRequest.getCategoryId());
-//            List<RecipeDtoForHome> recipeDtoForHome = recipes.stream()
-//                    .map(this::convertToDto)
-//                    .filter(r -> r.getIsVisible() == 1)
-//                    .toList();
-//        } else {
-//
-//        }
+        if(recipeByTitleAndCategoryIdRequest.getTitle() == null){
+            List<Recipe> recipes = recipeService.getAllByCategoryId(recipeByTitleAndCategoryIdRequest.getCategoryId());
+            List<RecipeDtoForHome> recipeDtoForHome = recipes.stream()
+                    .map( n -> {
+                        try {
+                            return convertToDto(n);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+
+                        }
+                        return null;
+                    })
+                    .filter(n -> n.getIsVisible() == 1)
+                    .toList();
+            return ResponseEntity.ok(recipeDtoForHome);
+        } else {
+            List<Recipe> recipes = recipeService.getAllByCategoryId(recipeByTitleAndCategoryIdRequest.getCategoryId());
+            List<RecipeDtoForHome> recipeDtoForHome = recipes.stream()
+                    .map( n -> {
+                        try {
+                            return convertToDto(n);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+
+                        }
+                        return null;
+                    })
+                    .filter(n -> n.getIsVisible() == 1)
+                    .toList();
+            return ResponseEntity.ok(recipeDtoForHome);
+        }
 //
 //        return ResponseEntity.ok(convertRecipeToDTO(recipes.stream().filter(r -> r.getIsVisible() == 1).collect(Collectors.toList())));
-        return null;
     }
 
 
@@ -89,17 +110,17 @@ public class HomeController {
 
     private RecipeDtoForHome convertToDto(Recipe recipe) throws IOException {
         RecipeDtoForHome recipeDtoForHome = modelMapper.map(recipe, RecipeDtoForHome.class);
-        List<IngredientDto> ingredientDtos = new ArrayList<>();
+        List<IngredientDtoForHome> ingredientDtoForHomes = new ArrayList<>();
 
         for(Ingredient i : recipe.getIngredients()) {
-            IngredientDto ingredientDto = new IngredientDto();
-            ingredientDto.setProductName(productService.findProductById(i.getProductId()).getName());
-            ingredientDto.setUnitName(unitService.findUnitById(i.getUnitId()).getName());
-            ingredientDto.setQuantity(i.getQuantity());
-            ingredientDto.setOrdinalNr(i.getOrdinalNr());
-            ingredientDtos.add(ingredientDto);
+            IngredientDtoForHome ingredientDtoForHome = new IngredientDtoForHome();
+            ingredientDtoForHome.setProductName(i.getProduct().getName());
+            ingredientDtoForHome.setUnitName(i.getUnit().getName());
+            ingredientDtoForHome.setQuantity(i.getQuantity());
+            ingredientDtoForHome.setOrdinalNr(i.getOrdinalNr());
+            ingredientDtoForHomes.add(ingredientDtoForHome);
         }
-        recipeDtoForHome.setIngredients(ingredientDtos);
+        recipeDtoForHome.setIngredients(ingredientDtoForHomes);
 
         File fileTmp = new File(UPLOAD_PATH);
         String absolutePath = fileTmp.getAbsolutePath();

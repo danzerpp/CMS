@@ -1,6 +1,5 @@
 package com.example.culinaryblogapi.dto;
 
-import com.example.culinaryblogapi.model.Ingredient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +20,7 @@ public class RecipeDto {
     int calories;
     long actionUserId;
     int isVisible;
-    List<Ingredient> ingredients;
+    List<IngredientDto> ingredients;
     MultipartFile recipeImage;
     String image;
 }

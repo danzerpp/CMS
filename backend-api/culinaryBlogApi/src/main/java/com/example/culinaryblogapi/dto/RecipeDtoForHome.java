@@ -20,7 +20,7 @@ public class RecipeDtoForHome {
     int calories;
     long actionUserId;
     int isVisible;
-    List<IngredientDto> ingredients;
+    List<IngredientDtoForHome> ingredients;
     MultipartFile recipeImage;
     String image;
 }

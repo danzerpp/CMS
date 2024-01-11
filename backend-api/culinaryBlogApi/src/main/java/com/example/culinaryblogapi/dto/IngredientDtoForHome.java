@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IngredientDto {
-    private long productId;
-    private long unitId;
+public class IngredientDtoForHome {
+    private String productName;
+    private String unitName;
     private double quantity;
     private int ordinalNr;
 }

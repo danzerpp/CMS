@@ -1,15 +1,14 @@
 package com.example.culinaryblogapi.controller;
 
 import com.example.culinaryblogapi.config.JwtService;
+import com.example.culinaryblogapi.dto.IngredientDto;
 import com.example.culinaryblogapi.dto.RecipeDto;
 import com.example.culinaryblogapi.model.Ingredient;
 import com.example.culinaryblogapi.model.Recipe;
 import com.example.culinaryblogapi.model.User;
 import com.example.culinaryblogapi.requestBody.ImageRequestBody;
 import com.example.culinaryblogapi.requestBody.RecipeByTitleAndCategoryIdRequest;
-import com.example.culinaryblogapi.service.IngredientService;
-import com.example.culinaryblogapi.service.RecipeService;
-import com.example.culinaryblogapi.service.UserService;
+import com.example.culinaryblogapi.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +47,12 @@ public class RecipeController {
     private RecipeService recipeService;
 
     @Autowired
+    private UnitService unitService;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
     private IngredientService ingredientService;
 
     @Autowired
@@ -61,17 +66,33 @@ public class RecipeController {
     public ResponseEntity<Recipe> add (
             @RequestBody RecipeDto recipeDTO
     ) {
+        List<IngredientDto> ingredientDtos = recipeDTO.getIngredients();
+        List<Ingredient> ingredientList = new ArrayList<>();
+
         var recipe = Recipe.builder()
                 .categoryId(recipeDTO.getCategoryId())
                 .calories(recipeDTO.getCalories())
                 .description(recipeDTO.getDescription())
-                .ingredients(recipeDTO.getIngredients())
                 .ordinalNr(recipeDTO.getOrdinalNr())
                 .isVisible(recipeDTO.getIsVisible())
                 .createdByUserId(userService.findUserById(recipeDTO.getActionUserId()).orElseThrow())
                 .title(recipeDTO.getTitle())
                 .build();
-        return ResponseEntity.ok(recipeService.addRecipe(recipe));
+
+        Recipe recipe1 = recipeService.addRecipe(recipe);
+
+        for(IngredientDto i : ingredientDtos){
+            Ingredient ingredient = new Ingredient();
+            ingredient.setQuantity(i.getQuantity());
+            ingredient.setUnit(unitService.findUnitById(i.getUnitId()));
+            ingredient.setOrdinalNr(i.getOrdinalNr());
+            ingredient.setProduct(productService.findProductById(i.getProductId()));
+            ingredient.setRecipe(recipe1);
+            ingredientList.add(ingredient);
+            ingredientService.save(ingredient);
+        }
+
+        return ResponseEntity.ok(recipe1);
     }
 
     @PostMapping(value = "/uploadImage")
@@ -121,7 +142,7 @@ public class RecipeController {
         for(Ingredient ingredient : recipe.getIngredients()){
             ingredientService.deleteRecipeById(ingredient.getId());
         }
-        recipe.setIngredients(recipeDTO.getIngredients());
+        //recipe.setIngredients(recipeDTO.getIngredients());
         recipe.setCalories(recipeDTO.getCalories());
         recipe.setTitle(recipeDTO.getTitle());
         recipe.setDescription(recipeDTO.getDescription());
@@ -172,7 +193,7 @@ public class RecipeController {
         String absolutePath = fileTmp.getAbsolutePath();
         for (Recipe recipe : recipes) {
             String base64Image;
-            if(!recipe.getPathToImage().isEmpty()){
+            if(!recipe.getPathToImage().isEmpty() && recipe.getPathToImage() != null){
                 File file = new File(absolutePath + "/" + recipe.getPathToImage());
                 FileInputStream fileInputStream = new FileInputStream(file);
                 byte[] bytes = new byte[(int) file.length()];
@@ -183,6 +204,16 @@ public class RecipeController {
             } else {
                 base64Image = "";
             }
+            List<Ingredient> ingredients = ingredientService.findAllByRecipe(recipe);
+            List<IngredientDto> ingredientsDtos = new ArrayList<>();
+            for(Ingredient i : ingredients){
+                IngredientDto ingredientDto = new IngredientDto();
+                ingredientDto.setOrdinalNr(i.getOrdinalNr());
+                ingredientDto.setQuantity(i.getQuantity());
+                ingredientDto.setProductId(i.getProduct().getId());
+                ingredientDto.setUnitId(i.getUnit().getId());
+                ingredientsDtos.add(ingredientDto);
+            }
 
             RecipeDto recipeDTO = RecipeDto.builder()
                     .recipeId(recipe.getId())
@@ -192,7 +223,7 @@ public class RecipeController {
                     .description(recipe.getDescription())
                     .calories(recipe.getCalories())
                     .isVisible(recipe.getIsVisible())
-                    .ingredients(recipe.getIngredients())
+                    .ingredients(ingredientsDtos)
                     .image(base64Image)
                     .build();
 

@@ -40,7 +40,7 @@ public class Recipe {
     @Column(name = "path_to_image")
     private String pathToImage;
 
-    @ManyToMany(cascade=CascadeType.ALL)
+    @OneToMany(cascade=CascadeType.ALL)
     private List<Ingredient> ingredients;
 
     @ManyToOne(fetch = FetchType.EAGER)

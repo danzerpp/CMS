@@ -29,9 +29,3 @@ INSERT INTO recipes (id, category_id, ordinal_no, title, description, calories, 
 INSERT INTO recipes (id, category_id, ordinal_no, title, description, calories, path_to_image, created_by_user_id, created_date, is_visible) VALUES(2, 1, 2, 'Przepis na zupe', 'Bardzo prosty przepis na zupe w 10 minut', 100, '', 3, NOW() ,1);
 
 INSERT INTO ingredients (id, recipe_id, product_id, unit_id, quantity, ordinal_no) VALUES (1, 1, 1, 1, 10, 1);
-
-insert into recipes_ingredients
-select r.id, i.id
-from   recipes r
-           left join lateral (select id from ingredients where id in (1)) i on true
-where  r.id in (1);
