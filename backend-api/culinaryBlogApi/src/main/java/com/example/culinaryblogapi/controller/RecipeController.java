@@ -6,11 +6,10 @@ import com.example.culinaryblogapi.model.Ingredient;
 import com.example.culinaryblogapi.model.Recipe;
 import com.example.culinaryblogapi.model.User;
 import com.example.culinaryblogapi.requestBody.ImageRequestBody;
+import com.example.culinaryblogapi.requestBody.RecipeByTitleAndCategoryIdRequest;
 import com.example.culinaryblogapi.service.IngredientService;
 import com.example.culinaryblogapi.service.RecipeService;
 import com.example.culinaryblogapi.service.UserService;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/recipes")
@@ -135,7 +135,7 @@ public class RecipeController {
 
     @GetMapping(value="", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RecipeDto>> getAllRecipes (
-            @RequestBody(required=false) String title
+            @RequestBody RecipeByTitleAndCategoryIdRequest recipeByTitleAndCategoryIdRequest
     ) throws IOException {
         // dodac categoryId
         List<Recipe> recipes;
@@ -150,15 +150,15 @@ public class RecipeController {
             isAdminRequest = true;
         }
 
-        if(title == null){
-            recipes = isAdminRequest ? recipeService.getAll() : recipeService.findAllByCreatedByUserId(user);
+        if(recipeByTitleAndCategoryIdRequest.getTitle() == null){
+            recipes = isAdminRequest ? recipeService.getAllByCategoryId(recipeByTitleAndCategoryIdRequest.getCategoryId())
+                    : recipeService.findAllByCreatedByUserIdAndCategoryId(user, recipeByTitleAndCategoryIdRequest.getCategoryId());
         } else {
-            JsonObject jsonObject = JsonParser.parseString(title)
-                    .getAsJsonObject();
-            recipes = isAdminRequest ? recipeService.findAllByTitleLike(jsonObject.get("title").getAsString())
-                                        : recipeService.findAllByTitleLikeAndCreatedByUserId(jsonObject.get("title").getAsString(), user);
+            recipes = isAdminRequest ? recipeService.findAllByTitleContainingIgnoreCaseAndCategoryId(recipeByTitleAndCategoryIdRequest.getTitle(), recipeByTitleAndCategoryIdRequest.getCategoryId())
+                                        : recipeService.findAllByTitleContainingIgnoreCaseAndCreatedByUserIdAndCategoryId(recipeByTitleAndCategoryIdRequest.getTitle(), user, recipeByTitleAndCategoryIdRequest.getCategoryId());
         }
-        return ResponseEntity.ok(convertRecipeToDTO(recipes));
+
+        return ResponseEntity.ok(convertRecipeToDTO(recipes.stream().filter(r -> r.getIsVisible() == 1).collect(Collectors.toList())));
     }
 
     @GetMapping("/{recipeId}")

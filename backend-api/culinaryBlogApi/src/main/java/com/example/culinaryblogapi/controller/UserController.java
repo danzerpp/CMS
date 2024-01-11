@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -91,7 +92,10 @@ public class UserController {
 
     @GetMapping("")
     public ResponseEntity<List<User>> getAllUsers () {
-        return ResponseEntity.ok(userService.getAll());
+        return ResponseEntity.ok(userService.getAll()
+                .stream()
+                .filter(u -> u.getIsDeleted() == 0)
+                .collect(Collectors.toList()));
     }
 
 }

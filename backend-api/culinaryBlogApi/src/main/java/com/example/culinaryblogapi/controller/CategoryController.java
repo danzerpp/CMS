@@ -70,6 +70,7 @@ public class CategoryController {
         List<Category> categories = categoryService.getAll();
         List<CategoryDto> categoryDtos = categories.stream()
                 .map(this::convertToDto)
+                .filter(c -> c.getIsVisible() == 1)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(categoryDtos);
     }

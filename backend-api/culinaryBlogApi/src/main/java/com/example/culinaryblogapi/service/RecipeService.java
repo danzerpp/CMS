@@ -19,9 +19,10 @@ public interface RecipeService {
 
     List<Recipe> getAllByCategoryId(long categoryId);
 
-    List<Recipe> findAllByTitleLike(String title);
+    List<Recipe> findAllByCreatedByUserIdAndCategoryId(User user, long categoryId);
 
-    List<Recipe> findAllByTitleLikeAndCreatedByUserId(String title, User user);
-    List<Recipe> findAllByCreatedByUserId(User user);
+    List<Recipe> findAllByTitleContainingIgnoreCaseAndCategoryId(String title, long categoryId);
+
+    List<Recipe> findAllByTitleContainingIgnoreCaseAndCreatedByUserIdAndCategoryId(String title, User user, long categoryId);
 
 }

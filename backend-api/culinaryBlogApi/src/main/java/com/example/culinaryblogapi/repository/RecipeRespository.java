@@ -9,11 +9,14 @@ import java.util.Optional;
 
 public interface RecipeRespository extends JpaRepository<Recipe, Long> {
     Optional<Recipe> findRecipeById(long recipeId);
-    List<Recipe> findAllByCategoryId(long categoryId);
-
-    List<Recipe> findByTitleContainingIgnoreCase(String title);
 
     List<Recipe> findAllByCreatedByUserId(User user);
 
-    List<Recipe> findAllByTitleLikeAndCreatedByUserId(String title, User user);
+    List<Recipe> findAllByCategoryId(long categoryId);
+
+    List<Recipe> findAllByCreatedByUserIdAndCategoryId(User user, long categoryId);
+
+    List<Recipe> findAllByTitleContainingIgnoreCaseAndCategoryId(String title, long categoryId);
+
+    List<Recipe> findAllByTitleContainingIgnoreCaseAndCreatedByUserIdAndCategoryId(String title, User user, long categoryId);
 }

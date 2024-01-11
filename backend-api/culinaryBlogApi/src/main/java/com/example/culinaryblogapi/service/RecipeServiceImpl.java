@@ -47,17 +47,18 @@ public class RecipeServiceImpl implements RecipeService{
     }
 
     @Override
-    public List<Recipe> findAllByTitleLike(String title) {
-        return recipeRespository.findByTitleContainingIgnoreCase(title);
+    public List<Recipe> findAllByCreatedByUserIdAndCategoryId(User user, long categoryId) {
+        return recipeRespository.findAllByCreatedByUserIdAndCategoryId(user, categoryId);
     }
 
     @Override
-    public List<Recipe> findAllByTitleLikeAndCreatedByUserId(String title, User user) {
-        return recipeRespository.findAllByTitleLikeAndCreatedByUserId(title, user);
+    public List<Recipe> findAllByTitleContainingIgnoreCaseAndCategoryId(String title, long categoryId) {
+        return recipeRespository.findAllByTitleContainingIgnoreCaseAndCategoryId(title, categoryId);
     }
 
     @Override
-    public List<Recipe> findAllByCreatedByUserId(User user) {
-        return recipeRespository.findAllByCreatedByUserId(user);
+    public List<Recipe> findAllByTitleContainingIgnoreCaseAndCreatedByUserIdAndCategoryId(String title, User user, long categoryId) {
+        return recipeRespository.findAllByTitleContainingIgnoreCaseAndCreatedByUserIdAndCategoryId(title, user, categoryId);
     }
+
 }
