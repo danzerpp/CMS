@@ -17,4 +17,9 @@ public class UnitServiceImpl implements UnitService {
     public List<Unit> getAll() {
         return unitRepository.findAll();
     }
+
+    @Override
+    public Unit findUnitById(long unitId) {
+        return unitRepository.findUnitById(unitId);
+    }
 }

@@ -34,7 +34,8 @@ public class CategoryController {
     public ResponseEntity<?> add (
             @RequestBody CategoryDto categoryDto
     ) {
-        if(categoryService.findCategoryByName(categoryDto.getName()) != null) {
+        Category category = categoryService.findCategoryByName(categoryDto.getName());
+        if(categoryService.findCategoryByName(categoryDto.getName()) == null) {
             return ResponseEntity.ok(categoryService.addCategory(Category.builder()
                     .createdBy(userService.findUserById(categoryDto.getCreatedByUserId()).orElseThrow())
                     .name(categoryDto.getName())
