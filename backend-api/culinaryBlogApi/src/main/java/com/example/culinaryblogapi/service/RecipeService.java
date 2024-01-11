@@ -1,6 +1,7 @@
 package com.example.culinaryblogapi.service;
 
 import com.example.culinaryblogapi.model.Recipe;
+import com.example.culinaryblogapi.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,10 @@ public interface RecipeService {
     Optional<Recipe> findRecipeById(long recipeId);
 
     List<Recipe> getAllByCategoryId(long categoryId);
+
+    List<Recipe> findAllByTitleLike(String title);
+
+    List<Recipe> findAllByTitleLikeAndCreatedByUserId(String title, User user);
+    List<Recipe> findAllByCreatedByUserId(User user);
+
 }

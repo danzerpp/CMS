@@ -1,6 +1,7 @@
 package com.example.culinaryblogapi.service;
 
 import com.example.culinaryblogapi.model.Recipe;
+import com.example.culinaryblogapi.model.User;
 import com.example.culinaryblogapi.repository.RecipeRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,5 +44,20 @@ public class RecipeServiceImpl implements RecipeService{
     @Override
     public List<Recipe> getAllByCategoryId(long categoryId) {
         return recipeRespository.findAllByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<Recipe> findAllByTitleLike(String title) {
+        return recipeRespository.findByTitleContainingIgnoreCase(title);
+    }
+
+    @Override
+    public List<Recipe> findAllByTitleLikeAndCreatedByUserId(String title, User user) {
+        return recipeRespository.findAllByTitleLikeAndCreatedByUserId(title, user);
+    }
+
+    @Override
+    public List<Recipe> findAllByCreatedByUserId(User user) {
+        return recipeRespository.findAllByCreatedByUserId(user);
     }
 }

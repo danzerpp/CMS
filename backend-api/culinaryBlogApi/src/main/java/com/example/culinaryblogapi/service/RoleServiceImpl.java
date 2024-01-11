@@ -17,4 +17,9 @@ public class RoleServiceImpl implements RoleService {
     public Optional<Role> findByName(String roleName) {
         return roleRepository.findByName(roleName);
     }
+
+    @Override
+    public Optional<Role> findById(long id) {
+        return roleRepository.findById(id);
+    }
 }

@@ -1,14 +1,16 @@
 package com.example.culinaryblogapi.controller;
 
+import com.example.culinaryblogapi.dto.CategoryDto;
 import com.example.culinaryblogapi.model.Category;
 import com.example.culinaryblogapi.service.CategoryService;
 import com.example.culinaryblogapi.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -22,12 +24,19 @@ public class CategoryController {
     @Autowired
     private UserService userService;
 
+    private final UserDetailsService userDetailsService;
+
     @PostMapping("/add")
     public ResponseEntity<Category> add (
-            @RequestBody Category category
+            @RequestBody CategoryDto categoryDto
     ) {
-        category.setCreatedBy(userService.findUserById(category.getCreatedBy().getId()).orElseThrow());
-        return ResponseEntity.ok(categoryService.addCategory(category));
+        return ResponseEntity.ok(categoryService.addCategory(Category.builder()
+                .createdBy(userService.findUserById(categoryDto.getCreatedByUserId()).orElseThrow())
+                .name(categoryDto.getName())
+                .ordinalNr(categoryDto.getOrdinalNr())
+                .isVisible(categoryDto.getIsVisible())
+                .createdDate(LocalDateTime.now())
+                .build()));
     }
 
     @DeleteMapping("/remove/{categoryId}")
@@ -37,12 +46,15 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.deleteCategoryById(categoryId));
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/edit/{categoryId}")
     public ResponseEntity<?> edit (
-            @PathVariable("id") Category targetCategory,  @RequestBody Category sourceCategory
+            @PathVariable("categoryId") long categoryId, @RequestBody CategoryDto categoryDto
     ) {
-        BeanUtils.copyProperties(sourceCategory, targetCategory, "id", "password");
-        return ResponseEntity.ok(categoryService.save(targetCategory));
+        Category category = categoryService.findCategoryById(categoryId);
+        category.setName(category.getName());
+        category.setOrdinalNr(categoryDto.getOrdinalNr());
+        category.setIsVisible(categoryDto.getIsVisible());
+        return ResponseEntity.ok(categoryService.save(category));
     }
 
     @GetMapping("")

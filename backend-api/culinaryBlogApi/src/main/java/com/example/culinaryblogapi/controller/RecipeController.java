@@ -1,23 +1,36 @@
 package com.example.culinaryblogapi.controller;
 
+import com.example.culinaryblogapi.config.JwtService;
+import com.example.culinaryblogapi.dto.RecipeDto;
+import com.example.culinaryblogapi.model.Ingredient;
 import com.example.culinaryblogapi.model.Recipe;
 import com.example.culinaryblogapi.model.User;
 import com.example.culinaryblogapi.requestBody.ImageRequestBody;
+import com.example.culinaryblogapi.service.IngredientService;
 import com.example.culinaryblogapi.service.RecipeService;
 import com.example.culinaryblogapi.service.UserService;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -25,20 +38,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecipeController {
 
-    private static final String UPLOAD_PATH = "/Users/apple/Repos/CMS/backend-api/culinaryBlogApi/src/main/resources/static/image/";
+    @Autowired
+    private HttpServletRequest request;
+
+    @Value("${image.folder}")
+    private String UPLOAD_PATH;
 
     @Autowired
     private RecipeService recipeService;
 
     @Autowired
+    private IngredientService ingredientService;
+
+    @Autowired
     private UserService userService;
+
+    private final UserDetailsService userDetailsService;
+
+    private final JwtService jwtService;
 
     @PostMapping("/add")
     public ResponseEntity<Recipe> add (
-            @RequestBody Recipe recipe
+            @RequestBody RecipeDto recipeDTO
     ) {
-        User user = userService.findUserById(recipe.getCreatedByUserId().getId()).orElseThrow();
-        recipe.setCreatedByUserId(user);
+        var recipe = Recipe.builder()
+                .categoryId(recipeDTO.getCategoryId())
+                .calories(recipeDTO.getCalories())
+                .description(recipeDTO.getDescription())
+                .ingredients(recipeDTO.getIngredients())
+                .ordinalNr(recipeDTO.getOrdinalNr())
+                .isVisible(recipeDTO.getIsVisible())
+                .createdByUserId(userService.findUserById(recipeDTO.getActionUserId()).orElseThrow())
+                .title(recipeDTO.getTitle())
+                .build();
         return ResponseEntity.ok(recipeService.addRecipe(recipe));
     }
 
@@ -48,10 +80,11 @@ public class RecipeController {
     ) {
         String fileName = imageRequestBody.getRecipeImage().getOriginalFilename();
         try {
-            String pathToImage = UPLOAD_PATH + fileName;
-            imageRequestBody.getRecipeImage().transferTo(new File(pathToImage));
+            File file = new File(UPLOAD_PATH);
+            String absolutePath = file.getAbsolutePath();
+            imageRequestBody.getRecipeImage().transferTo(new File(absolutePath + "/" + fileName));
             Recipe recipe = recipeService.findRecipeById(imageRequestBody.getRecipeId()).orElseThrow();
-            recipe.setPathToImage(pathToImage);
+            recipe.setPathToImage(fileName);
             recipeService.save(recipe);
             return ResponseEntity.ok("File uploaded successfully.");
         } catch (Exception e) {
@@ -80,22 +113,94 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.deleteRecipeById(recipeId));
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/edit")
     public ResponseEntity<?> edit (
-            @PathVariable("id") Recipe targetRecipe, @RequestBody Recipe sourceRecipe
+             @RequestBody RecipeDto recipeDTO
     ) {
-        BeanUtils.copyProperties(sourceRecipe, targetRecipe, "id", "password");
-        return ResponseEntity.ok(recipeService.save(targetRecipe));
+        Recipe recipe = recipeService.findRecipeById(recipeDTO.getRecipeId()).orElseThrow();
+        for(Ingredient ingredient : recipe.getIngredients()){
+            ingredientService.deleteRecipeById(ingredient.getId());
+        }
+        recipe.setIngredients(recipeDTO.getIngredients());
+        recipe.setCalories(recipeDTO.getCalories());
+        recipe.setTitle(recipeDTO.getTitle());
+        recipe.setDescription(recipeDTO.getDescription());
+        recipe.setEditedByUserId(userService.findUserById(recipeDTO.getActionUserId()).orElseThrow());
+        recipe.setEditedDate(LocalDateTime.now());
+        recipe.setCategoryId(recipeDTO.getCategoryId());
+        recipe.setIsVisible(recipeDTO.getIsVisible());
+        recipe.setOrdinalNr(recipeDTO.getOrdinalNr());
+        return ResponseEntity.ok(recipeService.save(recipe));
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<Recipe>> getAllRecipes () {
-        return ResponseEntity.ok(recipeService.getAll());
+    @GetMapping(value="", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RecipeDto>> getAllRecipes (
+            @RequestBody(required=false) String title
+    ) throws IOException {
+        List<Recipe> recipes;
+        final String authHeader = request.getHeader("Authorization");
+        String jwt = authHeader.substring(7);
+        String userEmail = jwtService.extractUsername(jwt);
+        UserDetails details = userDetailsService.loadUserByUsername(userEmail);
+        User user = (User) userService.findUserByEmail(details.getUsername());
+        boolean isAdminRequest = false;
+        if (details != null && details.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
+            isAdminRequest = true;
+        }
+
+        if(title == null){
+            recipes = isAdminRequest ? recipeService.getAll() : recipeService.findAllByCreatedByUserId(user);
+        } else {
+            JsonObject jsonObject = JsonParser.parseString(title)
+                    .getAsJsonObject();
+            recipes = isAdminRequest ? recipeService.findAllByTitleLike(jsonObject.get("title").getAsString())
+                                        : recipeService.findAllByTitleLikeAndCreatedByUserId(jsonObject.get("title").getAsString(), user);
+        }
+        return ResponseEntity.ok(convertRecipeToDTO(recipes));
     }
 
-    @GetMapping("/{categoryID}")
-    public ResponseEntity<List<Recipe>> getAllRecipesByCategoryId () {
-        return ResponseEntity.ok(recipeService.getAll());
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<List<RecipeDto>> getAllRecipesByCategoryId(@PathVariable long categoryId) throws IOException {
+        List<Recipe> recipes = recipeService.getAllByCategoryId(categoryId);
+        return ResponseEntity.ok(convertRecipeToDTO(recipes));
+    }
+
+    public List<RecipeDto> convertRecipeToDTO(List<Recipe> recipes) throws IOException {
+        List<RecipeDto> recipeDtos = new ArrayList<>();
+        File fileTmp = new File(UPLOAD_PATH);
+        String absolutePath = fileTmp.getAbsolutePath();
+        for (Recipe recipe : recipes) {
+            String base64Image;
+            if(!recipe.getPathToImage().isEmpty()){
+                File file = new File(absolutePath + "/" + recipe.getPathToImage());
+                FileInputStream fileInputStream = new FileInputStream(file);
+                byte[] bytes = new byte[(int) file.length()];
+                fileInputStream.read(bytes);
+                fileInputStream.close();
+
+                base64Image = Base64.getEncoder().encodeToString(bytes);
+            } else {
+                base64Image = "";
+            }
+
+            RecipeDto recipeDTO = RecipeDto.builder()
+                    .recipeId(recipe.getId())
+                    .categoryId(recipe.getCategoryId())
+                    .ordinalNr(recipe.getOrdinalNr())
+                    .title(recipe.getTitle())
+                    .description(recipe.getDescription())
+                    .calories(recipe.getCalories())
+                    .isVisible(recipe.getIsVisible())
+                    .ingredients(recipe.getIngredients())
+                    .image(base64Image)
+                    .build();
+
+            if(recipe.getIsVisible() == 1){
+                recipeDtos.add(recipeDTO);
+            }
+        }
+        return recipeDtos;
     }
 
 }
