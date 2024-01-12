@@ -61,7 +61,7 @@ public class HomeController {
         return ResponseEntity.ok(categoryDtos);
     }
 
-    @GetMapping("/recipe")
+    @PostMapping("/recipe")
     public ResponseEntity<?> getRecipeById (@RequestBody RecipeForId recipeForId) throws IOException {
         if(recipeService.findRecipeById(recipeForId.getRecipeId()).isPresent()) {
             Recipe recipe = recipeService.findRecipeById(recipeForId.getRecipeId()).get();

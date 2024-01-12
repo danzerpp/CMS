@@ -2,6 +2,7 @@ package com.example.culinaryblogapi.controller;
 
 import com.example.culinaryblogapi.dto.CategoryDto;
 import com.example.culinaryblogapi.model.Category;
+import com.example.culinaryblogapi.requestBody.ChangeOrderCategory;
 import com.example.culinaryblogapi.service.CategoryService;
 import com.example.culinaryblogapi.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -94,15 +95,17 @@ public class CategoryController {
         }
     }
 
-//    @PostMapping("/changeOrder")
-//    public ResponseEntity<Category> changeOrder (
-//            @RequestBody Map<Integer, Integer> order
-//    ) {
-//        List<Category> categories = categoryService.getAll();
-//        categories.stream().
-//        category.setCreatedBy(userService.findUserById(category.getCreatedBy().getId()).orElseThrow());
-//        return ResponseEntity.ok(categoryService.addCategory(category));
-//    }
+    @PostMapping("/changeOrder")
+    public ResponseEntity<?> changeOrder (
+            @RequestBody List<ChangeOrderCategory> changeOrderCategories
+    ) {
+        for (ChangeOrderCategory order : changeOrderCategories) {
+            Category category = categoryService.findCategoryById(order.getCategoryId());
+            category.setOrdinalNr(order.getOrdinalNr());
+            categoryService.save(category);
+        }
+        return ResponseEntity.ok("reorderd");
+    }
 
     private CategoryDto convertToDto(Category category) {
         CategoryDto categoryDto = modelMapper.map(category, CategoryDto.class);

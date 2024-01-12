@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDto {
+    private long categoryId;
     private String name;
     private int ordinalNr;
     private long createdByUserId;
