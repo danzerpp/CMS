@@ -2,8 +2,12 @@ package com.example.culinaryblogapi.controller;
 
 import com.example.culinaryblogapi.dto.CategoryDto;
 import com.example.culinaryblogapi.model.Category;
+import com.example.culinaryblogapi.model.Ingredient;
+import com.example.culinaryblogapi.model.Recipe;
 import com.example.culinaryblogapi.requestBody.ChangeOrderCategory;
 import com.example.culinaryblogapi.service.CategoryService;
+import com.example.culinaryblogapi.service.IngredientService;
+import com.example.culinaryblogapi.service.RecipeService;
 import com.example.culinaryblogapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +27,12 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private RecipeService recipeService;
+
+    @Autowired
+    private IngredientService ingredientService;
 
     @Autowired
     private UserService userService;
@@ -54,6 +64,15 @@ public class CategoryController {
             @PathVariable long categoryId
     ) {
         if(categoryService.findCategoryById(categoryId) != null){
+            List<Recipe> recipes = recipeService.getAllByCategoryId(categoryId);
+            if(!recipes.isEmpty()){
+                for(Recipe r : recipes){
+                    for(Ingredient i : ingredientService.findAllByRecipe(r)){
+                        ingredientService.delete(i);
+                    }
+                    recipeService.deleteRecipeById(r.getId());
+                }
+            }
             return ResponseEntity.ok(categoryService.deleteCategoryById(categoryId));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category with id: " + categoryId + " not found");
