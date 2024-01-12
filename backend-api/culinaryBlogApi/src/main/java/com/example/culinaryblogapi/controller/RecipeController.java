@@ -135,7 +135,7 @@ public class RecipeController {
         }
     }
 
-    @PutMapping("/edit")
+    @PostMapping("/edit")
     public ResponseEntity<?> edit (
              @RequestBody RecipeDto recipeDTO
     ) {

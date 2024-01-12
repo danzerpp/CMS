@@ -67,7 +67,7 @@ public class HomeController {
             Recipe recipe = recipeService.findRecipeById(recipeForId.getRecipeId()).get();
             return ResponseEntity.ok(convertToDto(recipe));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recipe with id: " + recipeForId.getRecipeId() + " already exist!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recipe with id: " + recipeForId.getRecipeId() + " not found!");
         }
 
     }

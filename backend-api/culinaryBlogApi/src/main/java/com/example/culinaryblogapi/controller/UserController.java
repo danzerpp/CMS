@@ -58,12 +58,12 @@ public class UserController {
         }
     }
 
-    @PutMapping("/edit/{userId}")
+    @PostMapping("/edit")
     public ResponseEntity<?> edit (
-            @PathVariable long userId, @RequestBody UserDto userDto
+             @RequestBody UserDto userDto
     ) {
-        if(userService.findUserById(userId).isPresent()){
-            var user = userService.findUserById(userId).get();
+        if(!userService.findUserByEmail(userDto.getEmail()).isEmpty()){
+            var user = userService.findUserByEmail(userDto.getEmail()).get(0);
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             user.setRole(roleService.findById(userDto.getRoleId()).orElseThrow());
             user.setEmail(userDto.getEmail());
@@ -71,11 +71,11 @@ public class UserController {
             user.setIsDeleted(userDto.getIsVisible());
             return ResponseEntity.ok(userService.save(user));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with id: " + userId + " not found");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with email: " + userDto.getEmail() + " not found");
         }
     }
 
-    @PutMapping("/changePassword")
+    @PostMapping("/changePassword")
     public ResponseEntity<?> changePassword (
             @RequestBody ChangePasswordRequest changePasswordRequest
             ) {
