@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,9 +62,14 @@ public class HomeController {
     }
 
     @GetMapping("/recipe")
-    public ResponseEntity<RecipeDtoForHome> getRecipeById (@RequestBody RecipeForId recipeForId) throws IOException {
-        Recipe recipe = recipeService.findRecipeById(recipeForId.getRecipeId()).orElseThrow();
-        return ResponseEntity.ok(convertToDto(recipe));
+    public ResponseEntity<?> getRecipeById (@RequestBody RecipeForId recipeForId) throws IOException {
+        if(recipeService.findRecipeById(recipeForId.getRecipeId()).isPresent()) {
+            Recipe recipe = recipeService.findRecipeById(recipeForId.getRecipeId()).get();
+            return ResponseEntity.ok(convertToDto(recipe));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recipe with id: " + recipeForId.getRecipeId() + " already exist!");
+        }
+
     }
 
     @PostMapping(value="/recipes", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

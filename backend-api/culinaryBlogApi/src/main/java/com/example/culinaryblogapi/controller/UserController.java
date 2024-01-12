@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,12 +46,16 @@ public class UserController {
     }
 
     @PutMapping("/remove/{userId}")
-    public ResponseEntity<User> remove (
+    public ResponseEntity<?> remove (
             @PathVariable long userId
     ) {
-        User user = userService.findUserById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        user.setIsDeleted(1);
-        return ResponseEntity.ok(userService.removeUser(user));
+        if(userService.findUserById(userId).isPresent()){
+            User user = userService.findUserById(userId).get();
+            user.setIsDeleted(1);
+            return ResponseEntity.ok(userService.removeUser(user));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with id: " + userId + " not found");
+        }
     }
 
     @PutMapping("/edit/{userId}")
@@ -68,7 +71,7 @@ public class UserController {
             user.setIsDeleted(userDto.getIsVisible());
             return ResponseEntity.ok(userService.save(user));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with id: " + userId + " not found");
         }
     }
 
@@ -81,13 +84,17 @@ public class UserController {
             user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
             return ResponseEntity.ok(userService.save(user));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with id: " + changePasswordRequest.getUserId() + " not found");
         }
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById (@PathVariable long userId) {
-        return ResponseEntity.ok(userService.findUserById(userId).get());
+    public ResponseEntity<?> getUserById (@PathVariable long userId) {
+        if(userService.findUserById(userId).isPresent()){
+            return ResponseEntity.ok(userService.findUserById(userId).get());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with id: " + userId + " not found");
+        }
     }
 
     @GetMapping("")

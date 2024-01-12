@@ -1,5 +1,6 @@
 package com.example.culinaryblogapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,7 @@ public class Ingredient {
     private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonBackReference
     @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     private Recipe recipe;
 

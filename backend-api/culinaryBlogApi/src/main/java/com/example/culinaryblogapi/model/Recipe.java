@@ -1,5 +1,6 @@
 package com.example.culinaryblogapi.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,6 +42,7 @@ public class Recipe {
     private String pathToImage;
 
     @OneToMany(cascade=CascadeType.ALL)
+    @JsonManagedReference
     private List<Ingredient> ingredients;
 
     @ManyToOne(fetch = FetchType.EAGER)

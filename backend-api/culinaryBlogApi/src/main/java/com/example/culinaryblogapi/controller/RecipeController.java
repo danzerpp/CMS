@@ -123,7 +123,15 @@ public class RecipeController {
     public ResponseEntity<?> remove (
             @PathVariable long recipeId
     ) {
-        return ResponseEntity.ok(recipeService.deleteRecipeById(recipeId));
+        if(recipeService.findRecipeById(recipeId).isPresent()){
+            Recipe recipe = recipeService.findRecipeById(recipeId).get();
+            for(Ingredient i : ingredientService.findAllByRecipe(recipe)){
+                ingredientService.delete(i);
+            }
+            return ResponseEntity.ok(recipeService.deleteRecipeById(recipeId));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recipe with id: " + recipeId + " not found");
+        }
     }
 
     @PutMapping("/edit")
@@ -132,7 +140,7 @@ public class RecipeController {
     ) {
         Recipe recipe = recipeService.findRecipeById(recipeDTO.getRecipeId()).orElseThrow();
 
-        for(Ingredient ingredient : recipe.getIngredients()){
+        for(Ingredient ingredient : ingredientService.findAllByRecipe(recipe)){
             ingredientService.delete(ingredient);
         }
 
@@ -194,8 +202,12 @@ public class RecipeController {
     }
 
     @GetMapping("/{recipeId}")
-    public ResponseEntity<Recipe> getAllRecipesByRecipeId(@PathVariable long recipeId) throws IOException {
-        return ResponseEntity.ok(recipeService.findRecipeById(recipeId).get());
+    public ResponseEntity<?> getAllRecipesByRecipeId(@PathVariable long recipeId) throws IOException {
+        if(recipeService.findRecipeById(recipeId).isPresent()){
+            return ResponseEntity.ok(recipeService.findRecipeById(recipeId).get());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recipe with id: " + recipeId + " not found");
+        }
     }
 
     public List<RecipeDto> convertRecipeToDTO(List<Recipe> recipes) throws IOException {

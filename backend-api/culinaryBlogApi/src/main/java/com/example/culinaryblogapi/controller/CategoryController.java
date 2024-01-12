@@ -52,7 +52,11 @@ public class CategoryController {
     public ResponseEntity<?> remove (
             @PathVariable long categoryId
     ) {
-        return ResponseEntity.ok(categoryService.deleteCategoryById(categoryId));
+        if(categoryService.findCategoryById(categoryId) != null){
+            return ResponseEntity.ok(categoryService.deleteCategoryById(categoryId));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category with id: " + categoryId + " not found");
+        }
     }
 
     @PutMapping("/edit/{categoryId}")
@@ -60,10 +64,14 @@ public class CategoryController {
             @PathVariable("categoryId") long categoryId, @RequestBody CategoryDto categoryDto
     ) {
         Category category = categoryService.findCategoryById(categoryId);
-        category.setName(category.getName());
-        category.setOrdinalNr(categoryDto.getOrdinalNr());
-        category.setIsVisible(categoryDto.getIsVisible());
-        return ResponseEntity.ok(categoryService.save(category));
+        if(category != null){
+            category.setName(category.getName());
+            category.setOrdinalNr(categoryDto.getOrdinalNr());
+            category.setIsVisible(categoryDto.getIsVisible());
+            return ResponseEntity.ok(categoryService.save(category));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category with id: " + categoryId + " not found");
+        }
     }
 
     @GetMapping("")
@@ -77,8 +85,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<Category> getCategoryById (@PathVariable long categoryId) {
-        return ResponseEntity.ok(categoryService.findCategoryById(categoryId));
+    public ResponseEntity<?> getCategoryById (@PathVariable long categoryId) {
+        Category category = categoryService.findCategoryById(categoryId);
+        if(category != null){
+            return ResponseEntity.ok(category);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category with id: " + categoryId + " not found");
+        }
     }
 
 //    @PostMapping("/changeOrder")
