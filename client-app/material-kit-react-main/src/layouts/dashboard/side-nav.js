@@ -9,10 +9,18 @@ import {
   Divider,
   Drawer,
   Stack,
-  SvgIcon,
   Typography,
-  useMediaQuery
+  useMediaQuery,
+
 } from '@mui/material';
+import { GridLoadIcon, GridMenuIcon } from '@mui/x-data-grid';
+import { SvgIcon } from '@mui/material';
+import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
+import UserIcon from '@heroicons/react/24/solid/UserIcon';
+import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
+import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
+
+
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
@@ -24,6 +32,69 @@ export const SideNav = (props) => {
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const { t } = useTranslation();
+
+  function getItems()
+  {
+
+    var itemss = [
+      {
+        title: t("home"),
+        path: '/',
+        icon: (
+          <SvgIcon fontSize="small">
+            <ChartBarIcon />
+          </SvgIcon>
+        )
+      },
+      {
+        title: t("users"),
+        path: '/users',
+        icon: (
+          <SvgIcon fontSize="small">
+            <UsersIcon />
+          </SvgIcon>
+        )
+      },
+      {
+        title: t("categories"),
+        path: '/categories',
+        icon: (
+          <SvgIcon fontSize="small">
+            <ShoppingBagIcon />
+          </SvgIcon>
+        )
+      },
+      {
+        title: t("recipes"),
+        path: '/recipes',
+        icon: (
+          <SvgIcon fontSize="small">
+            <UserIcon />
+          </SvgIcon>
+        )
+      }
+      ,
+      {
+        title: t("main-page-route"),
+        path: '/main',
+        icon: (
+          <SvgIcon fontSize="small">
+            <GridMenuIcon />
+          </SvgIcon>
+        )
+      }
+    ]
+    try{
+      var userData = JSON.parse(localStorage.getItem('authenticated_user'))
+      if(userData.role !=="ADMIN")
+        itemss = itemss.filter(i=> i.path !=='/users' && i.path !=='/categories')
+    }catch(e)
+    {
+        return [];
+    }
+   
+  return itemss;
+  }
 
   const content = (
     <Scrollbar
@@ -108,7 +179,7 @@ export const SideNav = (props) => {
               m: 0
             }}
           >
-            {items.map((item) => {
+            {getItems().map((item) => {
               const active = item.path ? (pathname === item.path) : false;
 
               return (

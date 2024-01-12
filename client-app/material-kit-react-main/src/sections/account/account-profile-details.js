@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState , useEffect} from 'react';
 
 import { useTranslation }  from "react-i18next";
 import { useRouter } from 'next/navigation';
@@ -27,15 +27,71 @@ const states = [
   }
 ];
 
-export const AccountProfileDetails = () => {
+export const AccountProfileDetails = ({parentProps}) => {
   const { i18n, t } = useTranslation();
-  const router = useRouter();
   const [values, setValues] = useState({
-    fullname: '',
-    password: '',
-    email: '',
-    role: 1
+    fullname: 'sdfsfs',
+    password: 'sss',
+    email: 'sdfsdfsd',
+    role: 2
   });
+
+  const router = useRouter();
+const[isLoading,setIsLoading] = useState(false);
+
+  async function fetchUser() {
+    console.log('haha')
+    console.log(parentProps.router.query.userId)
+    if(parentProps.router.query.userId === undefined)
+    return;
+
+var data = {}
+      var options = {  
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+        }
+      }
+  
+      const urll = 'http://localhost:8080/api/admin/users/'+parentProps.router.query.userId
+       var response = await fetch(urll, options)
+      var existingUser = await response.json()
+
+      if(existingUser === null)
+      {
+        data = {
+          fullname: '',
+          password: '',
+          email: '',
+          role: 1
+        };
+      }
+      else{
+        data = {
+          fullname: existingUser.fullName,
+          email: existingUser.email,
+          role: existingUser.role.id
+        };
+      }
+    console.log('haha22')
+    setValues(data)
+    console.log(data)
+    console.log('haha33')
+    setTimeout(() => {
+      setIsLoading(false)
+        
+      }, 222);
+  }
+  
+ 
+
+
+  useEffect(() => {
+     fetchUser();
+ 
+}, []);
 
   const handleChange = 
     (event) => {
@@ -46,7 +102,6 @@ export const AccountProfileDetails = () => {
         ...prevState,
         [event.target.name]: event.target.value
       }));
-      console.log(values)
     }
 
   function validateEmail(email) {
@@ -56,8 +111,11 @@ export const AccountProfileDetails = () => {
 
   const  handleSubmit = 
   async (event) => {
+
       event.preventDefault();
-      console.log(values);
+      if(parentProps.router.query.userId === undefined)
+    {
+
      if(!validateEmail(values.email)){
         alert(t("wrong-email"));
         return;
@@ -94,10 +152,49 @@ export const AccountProfileDetails = () => {
     console.log(response);
 
     router.push('/users')
+  }
+  else{
+      if(!validateEmail(values.email)){
+        alert(t("wrong-email"));
+        return;
+    }
+  
+    if(values.fullname.length < 1){
+      alert(t("wrong-fullname"));
+      return;
+    }
+
+  var userDto = {
+    fullName: values.fullname,
+    email : values.email,
+    password :'',
+    roleId: values.role,
+    isVisible:1
+  }
+  
+    const URL = 'http://localhost:8080/api/admin/users/edit'
+
+    var options = {  
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+      'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+      },
+      body : JSON.stringify(userDto)
+    }
+
+    var response = await fetch(URL,options);
+    console.log(response);
+
+    router.push('/users')
+  }
 
     }
 
-  
+    if (isLoading) {
+      return null;
+    }
 
   return (
     <form
@@ -107,7 +204,8 @@ export const AccountProfileDetails = () => {
     >
       <Card>
         <CardHeader
-          title={t("add")}
+          title={  parentProps.router.query.userId === undefined ?  t("add") : t("edit")}
+          subheader = {parentProps.router.query.userId === undefined ? '':values.email}
         />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
@@ -123,28 +221,27 @@ export const AccountProfileDetails = () => {
                   fullWidth
                   label= {t("user-name")}
                   name="fullname"
+                  value={values.fullname}
                   onChange={handleChange}
                   required
-                  value={values.firstName}
                 />
               </Grid>
-              <Grid
+              { parentProps.router.query.userId === undefined && (<Grid
                 xs={12}
                 md={6}
               >
-                <TextField
+              <TextField
                   fullWidth
                   label={t("password")}
                   name="password"
                   onChange={handleChange}
                   type='password'
                   required
-                  value={values.lastName}
-                  inputProps={{ minLength: 6 }}
+                  value={values.password}
                 />
-              </Grid>
+              </Grid>)}
             
-              <Grid
+              { parentProps.router.query.userId === undefined && (<Grid
                 xs={12}
                 md={6}
               >
@@ -152,12 +249,15 @@ export const AccountProfileDetails = () => {
                   fullWidth
                   label={t("address-email")}
                   name="email"
+                  inputProps={
+                    { readOnly: true, }
+                  }
                   type='email'
                   onChange={handleChange}
                   required
-                  value={values.country}
+                  value={values.email}
                 />
-              </Grid>
+              </Grid>)}
               <Grid
                 xs={12}
                 md={6}
@@ -170,7 +270,7 @@ export const AccountProfileDetails = () => {
                   required
                   select
                   SelectProps={{ native: true }}
-                  value={values.state}
+                  value={values.role}
                 >
                   {states.map((option) => (
                     <option

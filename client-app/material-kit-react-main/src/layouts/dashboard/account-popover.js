@@ -19,6 +19,28 @@ export const AccountPopover = (props) => {
     [onClose, auth, router]
   );
   var user = {};
+
+    const handleChangePassword = async () =>
+    {
+
+      try  
+{
+   user = JSON.parse(window.localStorage.getItem('authenticated_user'));
+   router.push({
+    pathname: '/forms/user/changePassword',
+    query: { userId: user.id,
+            userEmail: user.email
+    }
+}, '/forms/user/add')
+}
+catch (err) 
+{
+
+}
+
+     
+    }
+
 try  
 {
    user = JSON.parse(window.localStorage.getItem('authenticated_user'));
@@ -26,7 +48,6 @@ try
 }
 catch (err) 
 {
-  
 
 }
 
@@ -68,7 +89,7 @@ catch (err)
           }
         }}
       >
-         <MenuItem onClick={handleSignOut}>
+         <MenuItem onClick={handleChangePassword}>
           {t("change-password")}
         </MenuItem>
         <MenuItem onClick={handleSignOut}>

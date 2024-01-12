@@ -64,11 +64,9 @@ public class UserController {
     ) {
         if(!userService.findUserByEmail(userDto.getEmail()).isEmpty()){
             var user = userService.findUserByEmail(userDto.getEmail()).get(0);
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             user.setRole(roleService.findById(userDto.getRoleId()).orElseThrow());
             user.setEmail(userDto.getEmail());
             user.setFullName(userDto.getFullName());
-            user.setIsDeleted(userDto.getIsVisible());
             return ResponseEntity.ok(userService.save(user));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with email: " + userDto.getEmail() + " not found");

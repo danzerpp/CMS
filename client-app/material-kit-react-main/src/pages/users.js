@@ -60,7 +60,7 @@ function goToAddForm()
 {
   router.push({
     pathname: '/forms/user/add',
-    query: { userId: 1 }
+    query: { }
 }, '/forms/user/add')
     
   
@@ -114,9 +114,25 @@ function goToAddForm()
     enableRowActions: true,
    renderRowActionMenuItems: ({ row }) => [
     <MenuItem key="edit" onClick={() => {
+      router.push({
+        pathname: '/forms/user/add',
+        query: { userId: row.original.id}
+    }, '/forms/user/add')
     }
     }>
       {t("edit")}
+    </MenuItem>,
+     <MenuItem key="changepass" onClick={() => {
+
+      router.push({
+        pathname: '/forms/user/changePassword',
+        query: { userId: row.original.id,
+                userEmail: row.original.email
+        }
+    }, '/forms/user/add')
+    }
+    }>
+      {t("change-password")}
     </MenuItem>,
     <MenuItem key="delete" onClick={async () => {
           var res = confirm(t("delete-confirm"))

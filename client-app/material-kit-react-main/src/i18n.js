@@ -97,6 +97,8 @@ i18n
           "number-force": "Quantity must be a number!",
           "delete-confirm": "Are you sure you want to delete this record?",
           "error-login-deleted": "Your account is locked",
+          "password-again": "Confirm password",
+          "wrong-password-confirm": "Passwords are not same",
         },
       },
       pl: {
@@ -167,6 +169,8 @@ i18n
           "number-force": "Ilośc musi być liczbą!",
           "delete-confirm": "Na pewno usunąć rekord?",
           "error-login-deleted": "Twoje konto jest zablokowane",
+          "password-again": "Potwierdź hasło",
+          "wrong-password-confirm": "Hasła nie są identyczne",
 
         },
       }

@@ -11,9 +11,6 @@ import { GridLoadIcon, GridMenuIcon } from '@mui/x-data-grid';
 import { CalendarIcon } from '@mui/x-date-pickers';
 import i18n from 'src/i18n';
 
-
-    var userData = JSON.parse(localStorage.getItem('authenticated_user'))
-    console.log(userData);
     var itemss = [
       {
         title: i18n.t("home"),
@@ -62,8 +59,6 @@ import i18n from 'src/i18n';
         )
       }
     ]
-    if(userData.role !=="ADMIN")
-    itemss = itemss.filter(i=> i.path !=='/users' && i.path !=='/categories')
     
 export const items = [...itemss];
 

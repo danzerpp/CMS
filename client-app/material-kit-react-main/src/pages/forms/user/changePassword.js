@@ -2,31 +2,24 @@ import Head from 'next/head';
 import { Box, Container, Stack, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { AccountProfile } from 'src/sections/account/account-profile';
-import { AccountProfileDetails } from 'src/sections/account/account-profile-details';
+import { ChangePasswordDetails } from 'src/sections/account/change-profile-details.js';
 import { useTranslation }  from "react-i18next";
 import { withRouter } from 'next/router'
-import { useEffect } from 'react'
 import {
     Button,
   
   } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 const Page = (props) =>{
     const {t} = useTranslation();
-    console.log(props.router.query.userId);
+    console.log();
+    console.log(props.router.query.userEmail);
     const router = useRouter();
 
-  
-   ;
     function goBackToPage()
     {
         router.push("/users")
     }
-
-    useEffect(() => {
-
-  }, []);
 
 return(
   <>
@@ -68,7 +61,7 @@ return(
                 md={6}
                 lg={8}
               >
-                <AccountProfileDetails parentProps = {props} />
+                <ChangePasswordDetails userId ={props.router.query.userId} email={props.router.query.userEmail} />
               </Grid>
             </Grid>
           </div>
