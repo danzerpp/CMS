@@ -70,7 +70,7 @@ const router = useRouter();
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+        'Authorization':  'Bearer ' + window.sessionStorage.getItem('token') 
       },
       body : JSON.stringify(categoryDto)
     }

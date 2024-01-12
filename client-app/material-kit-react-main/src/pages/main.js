@@ -1,7 +1,7 @@
 
 import { Layout as MainLayout } from 'src/layouts/main/layout';
 
-import {  useState } from 'react';
+import {  useState,useEffect } from 'react';
 import { useTranslation }  from "react-i18next";
 import { useRouter } from 'next/navigation';
 
@@ -35,8 +35,10 @@ const data =[
 ]
 const Page = () =>
 {
-   const[categories,setCategories] = useState(data)
-   const[recipes,setRecipes] = useState(data)
+   const[categories,setCategories] = useState([])
+   const[recipes,setRecipes] = useState([])
+   const[title,setTitle] = useState('')
+   const[categorySelected,setCategorySelected] = useState()
    const router = useRouter();
   
   
@@ -68,12 +70,81 @@ const Page = () =>
     for (let index = 0; index < items.length; index++) {
       document.getElementById(items[index].id).classList.remove('selected')
     }
-
+    setCategorySelected(id);
     document.getElementById('category_'+ id).classList.add('selected')
+    fetchRecipes(id);
   }
 
+  function compareDecimals(a, b) {
+    if (a.ordinalNr === b.ordinalNr) 
+         return 0;
+
+    return a.ordinalNr - b.ordinalNr;
+}
+
+function changeFilter(e)
+{
+  setTitle(e.target.value);
+ 
+    fetchRecipes(categorySelected,e.target.value)
+
+}
+
+  async function fetchCategories() {
+
+    var options = {  
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+      }
+    }
+
+    const URL = 'http://localhost:8080/home/categories'
+     var response = await fetch(URL, options)
+    var bodyData = await response.json();
+    bodyData.sort(compareDecimals )
+    console.log(bodyData)
+    setCategories(bodyData);  
+    if(bodyData.length >0)
+    setTimeout(() => {
+      categoryClicked(bodyData[0].categoryId);
+    }, 100);
+  };
+
+  async function fetchRecipes(categoryId,titleRecipe) {
+
+    var options = {  
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+      },
+      body:JSON.stringify({
+          'title': titleRecipe,
+          categoryId: categoryId
+      })
+    }
+
+    const URL = 'http://localhost:8080/home/recipes'
+     var response = await fetch(URL, options)
+    var bodyData = await response.json();
+    bodyData.sort(compareDecimals )
+    console.log(bodyData)
+    setRecipes(bodyData);
+  };
+
+
+  useEffect(() => {
+
+    fetchCategories();
+}, []);
+
+
   function navigateToDetails(recipeId){
-    window.open('/recipeDetails?recipeId=1','_blank')
+    window.open('/recipeDetails?recipeId='+recipeId ,'_blank')
   //   router.push({
   //     pathname: '/recipeDetails',
   //     query: { recipeId: recipeId }
@@ -97,7 +168,7 @@ const Page = () =>
           {
             categories.map(function(data) {
               return (
-                <div id={'category_'+ data.id} className='category-name' onClick={function (e){categoryClicked(data.id)}}>
+                <div id={'category_'+ data.categoryId} className='category-name' onClick={function (e){categoryClicked(data.categoryId)}}>
                  <h2>  {data.name}</h2>
                 </div>
               )
@@ -105,32 +176,31 @@ const Page = () =>
             
           }
         </div>
-        <div style={{width:'50%',margin:'auto'}}>
-        <TextField style={{width:'80%',margin:'auto'}} placeholder={t("search-recipe-text")}></TextField>
+        <div style={{width:'50%','margin-left':'auto','margin-right':'auto'}}>
+        <TextField style={{width:'80%',margin:'auto'}} placeholder={t("search-recipe-text")} onChange={changeFilter}></TextField>
         </div>
 
         <div className='recipes-holder'>
         {
-            categories.map(function(data) {
+            recipes.map(function(data) {
               return (
 
                 <div className='recipe-detail'>
                   <div className='image-recipe'>
-                    <img src='./images/pizza-image.jpg' className='image-style' ></img>
-
+                    <img src={"data:image/png;base64, "+ data.image} className='image-style' ></img>
                   </div>
 
 
                   <div className='detail-recipe'>
                     <div className='details-recipe-texts'>
-                    <div>     <h1>  {data.name}</h1></div>
-                    <div>  <span>  Pizz awykonana w pełnej staranności i miłsfsddfsfdsfsfdsości wszystkicsddfsdfdsfsfsfdsh uzytkwoników<br></br> az chce się jeść !</span></div>
+                    <div>     <h1>  {data.title}</h1></div>
+                    <div>  <span style={{'white-space': 'pre-line'}}> {data.description}</span></div>
                
                  </div>
                   
                
                 <div className='recipe-button'>
-<Button onClick={function (e) {navigateToDetails(data.id)}} style={{ fontSize: '20px' }}>{t("detail-button")}</Button>
+<Button onClick={function (e) {navigateToDetails(data.recipeId)}} style={{ fontSize: '20px' }}>{t("detail-button")}</Button>
 
                 </div>
                 

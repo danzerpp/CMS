@@ -1,7 +1,7 @@
 
 import { Layout as MainLayout } from 'src/layouts/main/layout';
 
-import {  useState } from 'react';
+import {  useState, useEffect } from 'react';
 import { useTranslation }  from "react-i18next";
 
 
@@ -36,9 +36,54 @@ const data =[
 const Page = (props) =>
 {
    const[categories,setCategories] = useState(data)
+   const[recipe,setRecipe] = useState(
+    {
+      title:'',
+      image:'',
+      description:'',
+      ingredients:[]
+    }
+   )
    const[recipes,setRecipes] = useState(data)
    console.log(props.router.query.recipeId);
    const router = useRouter();
+
+   if(props.router.query.recipeId !== undefined && recipe.title  ==='')
+   fetchRecipe();
+
+  //  
+   
+  async function fetchRecipe() {
+    if(props.router.query.recipeId === undefined)
+      return;
+
+    var options = {  
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body:JSON.stringify({
+        recipeId: props.router.query.recipeId
+      })
+    }
+    console.log(options)
+    console.log(props.router.query.recipeId)
+
+    const URL = 'http://localhost:8080/home/recipe'
+     var response = await fetch(URL, options)
+    console.log(response)
+    var bodyData = await response.json();
+    console.log(bodyData)
+    setRecipe(bodyData);
+  };
+
+
+  useEffect(() => {
+setTimeout(() => {
+  fetchRecipe();
+}, 1300);
+}, []);
   
   
    var language = localStorage.getItem('app_language');
@@ -81,25 +126,29 @@ const Page = (props) =>
     
     <div className='main-detail-page-holder'>
        <div className='image-detail-holder'>
-<h1>PIZZA ITALIANA</h1>     </div>
+<h1>{recipe.title}</h1>     </div>
       <div className='image-detail-holder'>
-        <img src='./images/pizza-image.jpg' width={640} height={412} ></img>
+        <img src={"data:image/png;base64, "+ recipe.image} width={640} height={412} ></img>
       </div >
    
       <div className='article-detail'>
       <h3>Opis przepisu</h3>
 
-        <p>Przepis został wykoanny starannie jak nigdblablablablalablablbblaballbalbalbalablababababyPrzepis został wykoanny starannie jak nigdblablablablalablablbblaballbalbalbalablababababyPrzepis został wykoanny starannie jak nigdblablablablalablablbblaballbalbalbalablababababyPrzepis został wykoanny starannie jak nigdblablablablalablablbblaballbalbalbalablababababy</p>
+        <p style={{'white-space': 'pre-line'}}> {recipe.description}</p>
         </div>
         <div className='article-detail'>
       <h3>Kalorie</h3>
 
-        <p>250 kcal</p>
+        <p>{recipe.calories} kcal</p>
         </div>
         <div className='article-detail'>
       <h3>Składniki</h3>
-      <p>Mąka - 200 gram</p>
-      <p>Jajka - 3 szt.</p>
+
+      {recipe.ingredients.map(function(data) {
+              return (
+                <p>{data.productName} - {data.quantity} {data.unitName}</p>
+              )
+              })}
         </div>
     </div>
     

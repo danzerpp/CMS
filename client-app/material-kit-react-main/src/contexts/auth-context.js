@@ -125,8 +125,7 @@ export const AuthProvider = (props) => {
   };
 
   const signIn = async (email, password) => {
-console.log(email)
-console.log(password)
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,11 +134,13 @@ console.log(password)
 
     var responseData ={};
     var response = await fetch('http://localhost:8080/api/v1/auth/login', requestOptions)
-
     if(response.status != 200)   
       throw new Error(i18n.t("error-login"));
 
       responseData = await response.json();  
+
+      if(responseData == 'NOT_FOUND')
+        throw new Error(i18n.t("error-login-deleted"));
     
     try {
       window.sessionStorage.setItem('authenticated', 'true');
@@ -148,7 +149,9 @@ console.log(password)
     }
     window.sessionStorage.setItem('token', responseData.token);
     window.localStorage.setItem('token', responseData.token);
-console.log(responseData)
+    console.log(responseData)
+
+
     const user = {
       id: responseData.userId,
       avatar: '/assets/avatars/avatar-anika-visser.png',

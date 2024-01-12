@@ -48,9 +48,9 @@ const Page = () => {
   const [data, setData] = useState([]);
   const [sbData, setsbData] = useState([]);
   const [sbValue, setsbValue] = useState(0);
-  const [imgBase, setimgBase] = useState('');
+
   const router = useRouter();
-  imgBase
+  
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -81,10 +81,16 @@ const Page = () => {
     var bodyData = await response.json()
     bodyData.sort(compareDecimals )
     console.log(bodyData);
-    var resultList = bodyData.map(({ id, name }) => ({ value: id, label: name }));
+    var resultList = bodyData.map(({ categoryId, name }) => ({ value: categoryId, label: name }));
     setsbData(resultList)
-    setsbValue(resultList[0].value)
+    console.log('result here')
+    console.log(resultList)
+    if(resultList.length >0)
+    {
+      setsbValue(resultList[0].value)
       fetchRecipes(resultList[0].value)
+    }
+   
     setData(bodyData);
   };
 
@@ -146,7 +152,7 @@ async function fetchRecipes(categoryId)
     body: JSON.stringify(
       {
         title: "",
-        'categoryId':1
+        'categoryId':categoryId
       }
     )
 
@@ -159,8 +165,7 @@ async function fetchRecipes(categoryId)
   bodyData.sort(compareDecimals )
   console.log(bodyData);
   setData(bodyData);
-console.log(bodyData[2].image)
-  setimgBase(bodyData[2].image)
+  //  setimgBase(bodyData[2].image)
 }
 
 
@@ -168,9 +173,14 @@ console.log(bodyData[2].image)
 
 function goToAddForm()
 {
+  if(sbValue ===0 )
+    return;
+    console.log(sbValue);
   router.push({
     pathname: '/forms/recipe/add',
-    query: { maxOrdinal: data.length == 0 ? 0: data[data.length-1].ordinalNr }
+    query: { maxOrdinal: data.length == 0 ? 0: data[data.length-1].ordinalNr,
+            categoryId: sbValue
+     }
 }, '/forms/recipe/add')
     
   
@@ -200,6 +210,49 @@ function goToAddForm()
    enableSorting:false,
    enableFilters:false,
    enableRowOrdering:true,
+    muiRowDragHandleProps: ({ table }) => ({
+      onDragEnd: async () => {
+        const { draggingRow, hoveredRow } = table.getState();
+        if (hoveredRow && draggingRow) {
+         console.log(draggingRow)
+         console.log(hoveredRow)
+
+         data.splice(hoveredRow.index,0,data.splice(draggingRow.index, 1)[0],)
+         console.log(data)
+      
+        var fetchData = []
+        for (let i = 0; i < data.length; i++) {
+          const elem = data[i];
+          fetchData.push({
+            recipeId:elem.recipeId,
+            ordinalNr: i
+          })
+        }
+
+        var options = {  
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization':  'Bearer ' + window.localStorage.getItem('token') ,
+          },
+          body: JSON.stringify(
+            fetchData
+          )
+      
+        }
+      
+        var url = 'http://localhost:8080/api/admin/recipes/changeOrder'
+        var response = await fetch(url, options)
+        console.log(response);
+
+        fetchRecipes(sbValue)
+
+
+        //  setIngredients([...ingredients])
+        }
+      },
+    }),
    enableFullScreenToggle:false,
    enableDensityToggle:false,
    enableColumnDragging:false,
@@ -211,13 +264,6 @@ function goToAddForm()
       actions: t("actions"),
       move: t("move"),
       edit: t("edit"),
-      changeFilterMode: 'Alterar o modo de filtro',
-      changeSearchMode: 'Alterar o modo de pesquisa',
-      clearFilter: 'Limpar filtros',
-      clearSearch: 'Limpar pesquisa',
-      clearSort: 'Limpar classificações',
-      clickToCopy: 'Clique para copiar',
-      // ... and many more - see link below for full list of translation keys
     },
     enableRowActions: true,
     renderRowActionMenuItems: ({ row }) => [
@@ -226,13 +272,29 @@ function goToAddForm()
       }>
         {t("edit")}
       </MenuItem>,
-      <MenuItem key="delete" onClick={() => {
-  
-      }
-      }>
+      <MenuItem key="delete" onClick={async () => {
+        var res = confirm(t("delete-confirm"))
+          if(res)
+        {
+            var options = {  
+              method: 'DELETE',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+              }
+            }
+
+            const URL = 'http://localhost:8080/api/admin/recipes/remove/'+ row.original.recipeId
+            var response = await fetch(URL, options)
+            fetchRecipes(sbValue);
+        }
+  }
+  }>
         {t("delete")}
       </MenuItem>
     ]
+    
   });
 
   return (
@@ -257,7 +319,6 @@ function goToAddForm()
               spacing={4}
             >
               <Stack spacing={1}>
-              <img src={"data:image/png;base64, "+ imgBase} alt="Red dot" width={100} height={100} />
                 <Typography variant="h4">
                   {t("recipes")}
                 </Typography>

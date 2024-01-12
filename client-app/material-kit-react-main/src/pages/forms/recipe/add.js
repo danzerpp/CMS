@@ -81,7 +81,7 @@ return(
                 lg={8}
               >
                 <RecipeProfileDetails
-                file = {file} maxOrdinal = {props.router.query.maxOrdinal}
+                file = {file} maxOrdinal = {props.router.query.maxOrdinal} currCatId = {props.router.query.categoryId}
                 />
               </Grid>
             </Grid>

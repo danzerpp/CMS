@@ -28,6 +28,10 @@ import {
   MRT_EditActionButtons
  
 } from 'material-react-table';
+import { Router } from 'next/router';
+
+import { useRouter } from 'next/navigation';
+
 const states = [
   {
     value: 'ADMIN',
@@ -39,17 +43,18 @@ const states = [
   }
 ];
 
-export const RecipeProfileDetails = ({file,maxOrdinal}) => {
+export const RecipeProfileDetails = ({file,maxOrdinal,currCatId}) => {
   const { i18n, t } = useTranslation();
   const [sbData, setsbData] = useState([]);
   const [sbValue, setsbValue] = useState(0);
   const [products, setProducts] = useState(JSON.parse(localStorage.getItem('products_list')));
   const [units, setUnits] = useState(JSON.parse(localStorage.getItem('units_list')));
+  const router = useRouter();
 
   const [values, setValues] = useState({
     title: '',
     description: '',
-    calories: 0,
+    calories: 1,
     categoryId: 0,
     isVisible: true
   });
@@ -94,7 +99,7 @@ const [ingredients, setIngredients] = useState(
     var bodyData = await response.json()
     bodyData.sort(compareDecimals )
     console.log(bodyData);
-    var resultList = bodyData.map(({ id, name }) => ({ value: id, label: name }));
+    var resultList = bodyData.map(({ categoryId, name }) => ({ value: categoryId, label: name }));
     setsbData(resultList)
     setsbValue(resultList[0].value)
 
@@ -139,12 +144,23 @@ const columns = useMemo(
     {
       accessorKey: 'quantity', //access nested data with dot notation
       header: t("quantity"),
+
     
     }
   ],
   [],
 );
-
+function isInt(n){
+    return 
+}
+function isNumeric(str) {
+  if (typeof str != "string") return false // we only process strings!  
+  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
+function isFloat(n){
+    return Number(n) === n && n % 1 !== 0;
+}
 
 const table = useMaterialReactTable({
   enableSorting:false,
@@ -178,6 +194,20 @@ const table = useMaterialReactTable({
     table,
   }) => {
     console.log(values)
+
+    if(values.productId ==='' || values.unitId === '' || values.quantity ==='')
+    {
+      alert(t("fullfill-ingredient"))
+      return;
+    }
+
+    if(!isNumeric(values.quantity))
+    {
+      alert(t("number-force"))
+      return;
+    }
+
+  
     setIngredients([...ingredients,values]);
     table.setCreatingRow(null); //exit creating mode
   },
@@ -258,33 +288,64 @@ const table = useMaterialReactTable({
       }));
     }
 
+
+
+
   const handleSubmit = 
     async(event) => {
       event.preventDefault();
-      console.log(file)
+      console.log(values);
+      if(file === undefined){
+        alert(t('choose-file'))
+        return;
+      }  
+      
+      if(values.title.length ===0){
+        alert(t('set-title'))
+        return;
+      }   
+
+      if(values.description.length ===0){
+        alert(t('set-description'))
+        return;
+      }   
+
     
-     
+    if(ingredients.length ===0)
+    {
+      alert(t('set-ingredients'))
+        return;
+    }
+    
+ 
 
       var userData = JSON.parse(localStorage.getItem('authenticated_user'))
 
-var recipeDto = {
-  "categoryId": 1,
-  "ordinalNr": 1,
-  "title": "Spaghetti",
-  "description": "Wloski makaron",
-  "calories": "350",
-  "actionUserId": 1,
-  "isVisible": 1,
-  "ingredients": [
-      {
-          "productId": 1,
-          "unitId": 1,
-          "quantity": 20,
-          "ordinalNr": 1
+      console.log(ingredients)
+      var ingredientDtos = []
+      for (let i = 0; i < ingredients.length; i++) {
+        var ingredient = ingredients[i];
+        ingredientDtos.push({
+          "productId": ingredient.productId,
+          "unitId": ingredient.unitId,
+          "quantity": ingredient.quantity,
+          "ordinalNr": i
+        })
+        
       }
-  ]
+
+var recipeDto = {
+  "categoryId": parseInt(currCatId),
+  "ordinalNr": maxOrdinal,
+  "title": values.title,
+  "description": values.description,
+  "calories": values.calories,
+  "actionUserId": userData.id,
+  "isVisible": values.isVisible? 1 :0,
+  "ingredients": ingredientDtos
 }
-console.log(recipeDto)
+
+
       var url = 'http://localhost:8080/api/admin/recipes/add'
  
       var options = {  
@@ -321,7 +382,8 @@ console.log(recipeDto)
       }
   
       var response = await fetch(urlUpload,options);
-      console.log(response)
+     
+      router.push('/recipes')
     }
 
   return (
@@ -331,7 +393,6 @@ console.log(recipeDto)
       onSubmit={handleSubmit}
     >
       <Card>
-      <img width={100} height={100}></img>
         
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>

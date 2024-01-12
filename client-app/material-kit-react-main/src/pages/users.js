@@ -118,8 +118,23 @@ function goToAddForm()
     }>
       {t("edit")}
     </MenuItem>,
-    <MenuItem key="delete" onClick={() => {
+    <MenuItem key="delete" onClick={async () => {
+          var res = confirm(t("delete-confirm"))
+            if(res)
+          {
+              var options = {  
+                method: 'PUT',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+                }
+              }
 
+              const URL = 'http://localhost:8080/api/admin/users/remove/'+ row.original.id
+              var response = await fetch(URL, options)
+              fetchApiData();
+            }
     }
     }>
       {t("delete")}

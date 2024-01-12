@@ -99,6 +99,46 @@ function goToAddForm()
    enableSorting:false,
    enableFilters:false,
    enableRowOrdering:true,
+   
+    muiRowDragHandleProps: ({ table }) => ({
+      onDragEnd: async () => {
+        const { draggingRow, hoveredRow } = table.getState();
+        if (hoveredRow && draggingRow) {
+
+         data.splice(hoveredRow.index,0,data.splice(draggingRow.index, 1)[0],)
+      
+        var fetchListBody = []
+        for (let i = 0; i < data.length; i++) {
+          const elem = data[i];
+          fetchListBody.push({
+            categoryId:elem.categoryId,
+            ordinalNr: i
+          })
+        }
+
+        var options = {  
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization':  'Bearer ' + window.localStorage.getItem('token') ,
+          },
+          body: JSON.stringify(
+            fetchListBody
+          )
+      
+        }
+      
+        var url = 'http://localhost:8080/api/admin/categories/changeOrder'
+        var response = await fetch(url, options)
+
+        fetchApiData();
+
+
+        //  setIngredients([...ingredients])
+        }
+      },
+    }),
       enableFullScreenToggle:false,
    enableDensityToggle:false,
    enableColumnDragging:false,
@@ -125,10 +165,26 @@ function goToAddForm()
       }>
         {t("edit")}
       </MenuItem>,
-      <MenuItem key="delete" onClick={() => {
-  
-      }
-      }>
+      <MenuItem key="delete" onClick={async () => {
+        var res = confirm(t("delete-confirm"))
+        console.log(row)
+          if(res)
+        {
+            var options = {  
+              method: 'DELETE',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+              }
+            }
+
+            const URL = 'http://localhost:8080/api/admin/categories/remove/'+ row.original.categoryId
+            var response = await fetch(URL, options)
+            fetchApiData();
+        }
+  }
+  }>
         {t("delete")}
       </MenuItem>
     ]

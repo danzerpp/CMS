@@ -89,6 +89,14 @@ i18n
           "wrong-password": "Password must contain at least 6 characters!",
           "wrong-fullname": "Please provide fullname!",
           "error-category-name": "Please provide category name!",
+          "choose-file": "Choose file!",
+          "set-title": "Provide title!",
+          "set-description": "Provide description!",
+          "set-ingredients": "Add ingredients!",
+          "fullfill-ingredient": "Provide all data for ingredient!",
+          "number-force": "Quantity must be a number!",
+          "delete-confirm": "Are you sure you want to delete this record?",
+          "error-login-deleted": "Your account is locked",
         },
       },
       pl: {
@@ -151,6 +159,15 @@ i18n
           "wrong-password": "Hasło musi zawierać co najmniej 6 znaków!",
           "wrong-fullname": "Proszę podać imię i nazwisko!",
           "error-category-name": "Proszę podać nazwę przepisu!",
+          "choose-file": "Wybierz plik!",
+          "set-title": "Wpisz tytuł przepisu!",
+          "set-description": "Wpisz opis przepisu!",
+          "set-ingredients": "Dodaj składniki!",
+          "fullfill-ingredient": "Wypełnij dane składników!",
+          "number-force": "Ilośc musi być liczbą!",
+          "delete-confirm": "Na pewno usunąć rekord?",
+          "error-login-deleted": "Twoje konto jest zablokowane",
+
         },
       }
     }
