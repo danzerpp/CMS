@@ -79,18 +79,18 @@ public class CategoryController {
         }
     }
 
-    @PutMapping("/edit/{categoryId}")
+    @PutMapping("/edit")
     public ResponseEntity<?> edit (
-            @PathVariable("categoryId") long categoryId, @RequestBody CategoryDto categoryDto
+            @RequestBody CategoryDto categoryDto
     ) {
-        Category category = categoryService.findCategoryById(categoryId);
+        Category category = categoryService.findCategoryById(categoryDto.getCategoryId());
         if(category != null){
             category.setName(category.getName());
             category.setOrdinalNr(categoryDto.getOrdinalNr());
             category.setIsVisible(categoryDto.getIsVisible());
             return ResponseEntity.ok(categoryService.save(category));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category with id: " + categoryId + " not found");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category with id: " + categoryDto.getCategoryId() + " not found");
         }
     }
 
