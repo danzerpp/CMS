@@ -28,4 +28,9 @@ public class IngredientServiceImpl implements IngredientService {
     public List<Ingredient> findAllByRecipe(Recipe recipe) {
         return ingredientRespository.findAllByRecipe(recipe);
     }
+
+    @Override
+    public void delete(Ingredient ingredient) {
+        ingredientRespository.delete(ingredient);
+    }
 }
