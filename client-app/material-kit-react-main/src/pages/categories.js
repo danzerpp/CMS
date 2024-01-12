@@ -8,7 +8,8 @@ import {
   Stack,
   SvgIcon,
   Typography,
-  Unstable_Grid2 as Grid
+  Unstable_Grid2 as Grid,
+  MenuItem
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useTranslation }  from "react-i18next";
@@ -68,7 +69,7 @@ function goToAddForm()
 {
   router.push({
     pathname: '/forms/category/add',
-    query: { userId: 1 }
+    query: { maxOrdinal: data.length == 0 ? 0 : data[data.length-1].ordinalNr +1 }
 }, '/forms/category/add')
     
   
@@ -88,17 +89,6 @@ function goToAddForm()
         Cell: ({ cell }) => (
           <span>{cell.getValue() === 1 ? 'Tak': 'Nie'}</span>
         ),
-      },
-      {
-        accessorKey: 'id',
-        header: '',
-        Cell: ({ cell }) => (
-          <div>
-              <Button>Edytuj</Button>
-          <Button>Usuń</Button>
-          </div>
-        
-        ),
       }
     ],
     [],
@@ -109,8 +99,39 @@ function goToAddForm()
    enableSorting:false,
    enableFilters:false,
    enableRowOrdering:true,
+      enableFullScreenToggle:false,
+   enableDensityToggle:false,
+   enableColumnDragging:false,
+   enableHiding:false,
     data:data,
     columns,
+    
+    localization: {
+      actions: t("actions"),
+      move: t("move"),
+      edit: t("edit"),
+      changeFilterMode: 'Alterar o modo de filtro',
+      changeSearchMode: 'Alterar o modo de pesquisa',
+      clearFilter: 'Limpar filtros',
+      clearSearch: 'Limpar pesquisa',
+      clearSort: 'Limpar classificações',
+      clickToCopy: 'Clique para copiar',
+      // ... and many more - see link below for full list of translation keys
+    },
+    enableRowActions: true,
+    renderRowActionMenuItems: ({ row }) => [
+      <MenuItem key="edit" onClick={() => {
+      }
+      }>
+        {t("edit")}
+      </MenuItem>,
+      <MenuItem key="delete" onClick={() => {
+  
+      }
+      }>
+        {t("delete")}
+      </MenuItem>
+    ]
   });
 
   return (

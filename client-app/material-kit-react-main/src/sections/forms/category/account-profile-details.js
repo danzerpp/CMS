@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { useTranslation }  from "react-i18next";
+import { useRouter } from 'next/navigation';
 
 import {
   Box,
@@ -27,30 +28,62 @@ const states = [
   }
 ];
 
-export const AccountProfileDetails = () => {
+export const AccountProfileDetails = ({maxLength}) => {
   const { i18n, t } = useTranslation();
+const router = useRouter();
   
   const [values, setValues] = useState({
     name: '',
     isVisible: true
   });
 
-  const handleChange = useCallback(
+  const handleChange = 
     (event) => {
       setValues((prevState) => ({
         ...prevState,
         [event.target.name]: event.target.value
       }));
-    },
-    []
-  );
+    }
 
-  const handleSubmit = useCallback(
-    (event) => {
+  const  handleSubmit = 
+  async (event) => {
       event.preventDefault();
-    },
-    []
-  );
+      console.log(values)
+      if(values.name.length ==0)
+      {
+        alert(t("error-category-name"))
+        return;
+      }
+      var userData = JSON.parse(localStorage.getItem('authenticated_user'))
+
+      var categoryDto = {
+        name : values.name,
+        isVisible: values.isVisible ? 1 :0,
+        ordinalNr: maxLength,
+        createdByUserId: userData.id
+      }
+      console.log(categoryDto)
+      const URL = 'http://localhost:8080/api/admin/categories/add'
+ 
+    var options = {  
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+      },
+      body : JSON.stringify(categoryDto)
+    }
+    console.log(options)
+
+    var response = await fetch(URL,options);
+
+    if(response.status === 200)
+      router.push('/categories')
+    else{
+      alert(await response.text())
+    }
+    }
 
   return (
     <form
@@ -59,7 +92,9 @@ export const AccountProfileDetails = () => {
       onSubmit={handleSubmit}
     >
       <Card>
-       
+      <CardHeader
+          title={t("add")}
+        />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
             <Grid
@@ -90,7 +125,7 @@ export const AccountProfileDetails = () => {
                   fullWidth
                   label={t("is-visible")}
                   name="isVisible"
-                  onChange={handleChange}
+                  onChange={handleChange} 
                   required
                   checked={values.isVisible}
                 />
@@ -105,7 +140,7 @@ export const AccountProfileDetails = () => {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">
+          <Button type='submit' variant="contained">
             {t("save")}
           </Button>
         </CardActions>

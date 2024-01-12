@@ -21,7 +21,7 @@ export const AccountPopover = (props) => {
   var user = {};
 try  
 {
-   user = JSON.parse(window.sessionStorage.getItem('authenticated_user'));
+   user = JSON.parse(window.localStorage.getItem('authenticated_user'));
 
 }
 catch (err) 

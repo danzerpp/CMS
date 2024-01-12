@@ -4,7 +4,7 @@ import { subDays, subHours } from 'date-fns';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Container, Stack, SvgIcon, Typography,MenuItem } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CustomersTable } from 'src/sections/customer/customers-table';
@@ -15,13 +15,13 @@ import { useTranslation }  from "react-i18next";
 import {
   MaterialReactTable,
   useMaterialReactTable,
+  
 } from 'material-react-table';
 import { useRouter } from 'next/navigation';
 
 
 const Page = () => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const {t} = useTranslation();
   const [usersData, setUsersData] = useState([]);
   const router = useRouter();
@@ -39,7 +39,6 @@ const Page = () => {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
         'Content-Type': 'application/json',
         'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
       }
@@ -95,7 +94,37 @@ function goToAddForm()
   const table = useMaterialReactTable({
    
     data:usersData,
-    columns,
+    columns,  
+     enableFullScreenToggle:false,
+    enableDensityToggle:false,
+    enableColumnDragging:false,
+    enableHiding:false,
+    localization: {
+      actions: t("actions"),
+      move: t("move"),
+      edit: t("edit"),
+      changeFilterMode: 'Alterar o modo de filtro',
+      changeSearchMode: 'Alterar o modo de pesquisa',
+      clearFilter: 'Limpar filtros',
+      clearSearch: 'Limpar pesquisa',
+      clearSort: 'Limpar classificações',
+      clickToCopy: 'Clique para copiar',
+      // ... and many more - see link below for full list of translation keys
+    },
+    enableRowActions: true,
+   renderRowActionMenuItems: ({ row }) => [
+    <MenuItem key="edit" onClick={() => {
+    }
+    }>
+      {t("edit")}
+    </MenuItem>,
+    <MenuItem key="delete" onClick={() => {
+
+    }
+    }>
+      {t("delete")}
+    </MenuItem>
+  ]
   });
 
   return (

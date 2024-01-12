@@ -9,7 +9,8 @@ import {
   SvgIcon,
   Typography,
   Unstable_Grid2 as Grid,
-  TextField
+  TextField,
+  MenuItem
 } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useTranslation }  from "react-i18next";
@@ -47,8 +48,9 @@ const Page = () => {
   const [data, setData] = useState([]);
   const [sbData, setsbData] = useState([]);
   const [sbValue, setsbValue] = useState(0);
+  const [imgBase, setimgBase] = useState('');
   const router = useRouter();
-
+  imgBase
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -86,28 +88,79 @@ const Page = () => {
     setData(bodyData);
   };
 
+  async function fetchProducts() {
+
+    var options = {  
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+      }
+    }
+
+    const URL = 'http://localhost:8080/api/admin/products'
+     var response = await fetch(URL, options)
+    var bodyData = await response.json();
+    localStorage.setItem('products_list',JSON.stringify(bodyData))
+
+    
+  };
+
+  async function fetchUnits() {
+
+    var options = {  
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+      }
+    }
+
+    const URL = 'http://localhost:8080/api/admin/units'
+     var response = await fetch(URL, options)
+    var bodyData = await response.json()
+   localStorage.setItem('units_list',JSON.stringify(bodyData))
+  };
+
+  
+
+
   useEffect(() => {
 
     fetchCategories();
+    fetchProducts();
+    fetchUnits();
 }, []);
 
 async function fetchRecipes(categoryId)
 {
   var options = {  
-    method: 'GET',
+    method: 'POST',
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
-    }
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' + window.localStorage.getItem('token') ,
+    },
+    body: JSON.stringify(
+      {
+        title: "",
+        'categoryId':1
+      }
+    )
+
   }
 
-  const URL = 'http://localhost:8080/api/admin/recipes/'+categoryId
+  const URL = 'http://localhost:8080/api/admin/recipes'
   var response = await fetch(URL, options)
+  console.log(response)
   var bodyData = await response.json()
   bodyData.sort(compareDecimals )
   console.log(bodyData);
   setData(bodyData);
+console.log(bodyData[2].image)
+  setimgBase(bodyData[2].image)
 }
 
 
@@ -117,7 +170,7 @@ function goToAddForm()
 {
   router.push({
     pathname: '/forms/recipe/add',
-    query: { userId: 1 }
+    query: { maxOrdinal: data.length == 0 ? 0: data[data.length-1].ordinalNr }
 }, '/forms/recipe/add')
     
   
@@ -137,17 +190,6 @@ function goToAddForm()
         Cell: ({ cell }) => (
           <span>{cell.getValue() === 1 ? 'Tak': 'Nie'}</span>
         ),
-      },
-      {
-        accessorKey: 'id',
-        header: '',
-        Cell: ({ cell }) => (
-          <div>
-              <Button>{t("edit")}</Button>
-            <Button>{t("delete")}</Button>
-          </div>
-        
-        ),
       }
     ],
     [],
@@ -158,8 +200,39 @@ function goToAddForm()
    enableSorting:false,
    enableFilters:false,
    enableRowOrdering:true,
+   enableFullScreenToggle:false,
+   enableDensityToggle:false,
+   enableColumnDragging:false,
+   enableHiding:false,
     data:data,
     columns,
+    
+    localization: {
+      actions: t("actions"),
+      move: t("move"),
+      edit: t("edit"),
+      changeFilterMode: 'Alterar o modo de filtro',
+      changeSearchMode: 'Alterar o modo de pesquisa',
+      clearFilter: 'Limpar filtros',
+      clearSearch: 'Limpar pesquisa',
+      clearSort: 'Limpar classificações',
+      clickToCopy: 'Clique para copiar',
+      // ... and many more - see link below for full list of translation keys
+    },
+    enableRowActions: true,
+    renderRowActionMenuItems: ({ row }) => [
+      <MenuItem key="edit" onClick={() => {
+      }
+      }>
+        {t("edit")}
+      </MenuItem>,
+      <MenuItem key="delete" onClick={() => {
+  
+      }
+      }>
+        {t("delete")}
+      </MenuItem>
+    ]
   });
 
   return (
@@ -184,6 +257,7 @@ function goToAddForm()
               spacing={4}
             >
               <Stack spacing={1}>
+              <img src={"data:image/png;base64, "+ imgBase} alt="Red dot" width={100} height={100} />
                 <Typography variant="h4">
                   {t("recipes")}
                 </Typography>

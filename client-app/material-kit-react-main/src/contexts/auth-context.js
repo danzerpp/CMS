@@ -83,7 +83,7 @@ export const AuthProvider = (props) => {
 
     if (isAuthenticated) {
 
-      const user = JSON.parse(window.sessionStorage.getItem('authenticated_user'));
+      const user = JSON.parse(window.localStorage.getItem('authenticated_user'));
 
       dispatch({
         type: HANDLERS.INITIALIZE,
@@ -147,16 +147,18 @@ console.log(password)
       console.error(err);
     }
     window.sessionStorage.setItem('token', responseData.token);
-
+    window.localStorage.setItem('token', responseData.token);
+console.log(responseData)
     const user = {
       id: responseData.userId,
       avatar: '/assets/avatars/avatar-anika-visser.png',
       name: responseData.email,
       email: responseData.email,
-      token: responseData.token
+      token: responseData.token,
+      role: responseData.role
     };
 
-    window.sessionStorage.setItem('authenticated_user', JSON.stringify(user));
+    window.localStorage.setItem('authenticated_user', JSON.stringify(user));
 
     dispatch({
       type: HANDLERS.SIGN_IN,
@@ -170,7 +172,7 @@ console.log(password)
 
   const signOut = () => {
       window.sessionStorage.setItem('authenticated', 'false');
-    window.sessionStorage.setItem('authenticated_user', '');
+    window.localStorage.setItem('authenticated_user', '');
     dispatch({
       type: HANDLERS.SIGN_OUT
     });

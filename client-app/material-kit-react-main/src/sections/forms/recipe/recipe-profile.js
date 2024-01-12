@@ -1,3 +1,4 @@
+import { useTranslation }  from "react-i18next";
 
 import { useState } from "react";
 import {
@@ -23,6 +24,7 @@ import i18n from "i18next";
 
 export const RecipeProfile = ({ handleUpload }) =>{ 
   
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [file, setFile] = useState("");
@@ -48,6 +50,14 @@ export const RecipeProfile = ({ handleUpload }) =>{
   function handleFileChange(e) {
     if (e.target.files && e.target.files[0]) 
     {
+      const maxAllowedSize = 5 * 1024 * 1024;
+      if (e.target.files[0].size > maxAllowedSize ||  e.target.files[0].size < 1024*100) {
+      	// Here you can ask your users to load correct file
+        alert(t("file-wrong-size"))
+        e.target.value = ''
+        return;
+      }
+
       setFile(e.target.files[0]);
       handleUpload(e.target.files[0]);
       setFileToView(URL.createObjectURL(e.target.files[0]))
@@ -67,7 +77,7 @@ export const RecipeProfile = ({ handleUpload }) =>{
           flexDirection: 'column'
         }}
       >
-        <img src={fileToView}  width={300} height={200}/>
+        <img src={fileToView}  width={350} height={250}/>
         <br></br>
         <input type="file" name="image" onChange={handleFileChange} accept="image/png, image/gif, image/jpeg"/>
         

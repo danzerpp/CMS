@@ -12,6 +12,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import 'src/i18n'
 const clientSideEmotionCache = createEmotionCache();
 import 'src/styles/layoutStyles.css';
+import 'src/styles/main-page.css';
 
 const SplashScreen = () => null;
 

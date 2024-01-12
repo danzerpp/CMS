@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 const Page = (props) =>{
     const {t} = useTranslation();
-    console.log(props.router.query.name);
+    console.log(props.router.query.maxOrdinal);
     const router = useRouter();
 
     const [file, setFile] = useState();
@@ -81,7 +81,7 @@ return(
                 lg={8}
               >
                 <RecipeProfileDetails
-                file = {file}
+                file = {file} maxOrdinal = {props.router.query.maxOrdinal}
                 />
               </Grid>
             </Grid>
