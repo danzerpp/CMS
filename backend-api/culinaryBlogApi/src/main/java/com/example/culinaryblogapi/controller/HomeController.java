@@ -78,16 +78,15 @@ public class HomeController {
             recipes = recipeService.findAllByTitleContainingIgnoreCaseAndCategoryId(recipeByTitleAndCategoryIdRequest.getTitle(), recipeByTitleAndCategoryIdRequest.getCategoryId());
         }
         recipeDtoForHome = recipes.stream()
-                .map( n -> {
+                .map(n -> {
                     try {
                         return convertToDto(n);
                     } catch (IOException e) {
                         e.printStackTrace();
-
+                        return null;
                     }
-                    return null;
                 })
-                .filter(n -> n.getIsVisible() == 1)
+                .filter(n -> n != null && n.getIsVisible() == 1)
                 .toList();
         return ResponseEntity.ok(recipeDtoForHome);
     }
@@ -132,7 +131,6 @@ public class HomeController {
         }
 
         recipeDtoForHome.setImage(base64Image);
-
 
         return recipeDtoForHome;
     }

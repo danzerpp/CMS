@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -81,16 +82,7 @@ public class RecipeController {
 
         Recipe recipe1 = recipeService.addRecipe(recipe);
 
-        for(IngredientDto i : ingredientDtos){
-            Ingredient ingredient = new Ingredient();
-            ingredient.setQuantity(i.getQuantity());
-            ingredient.setUnit(unitService.findUnitById(i.getUnitId()));
-            ingredient.setOrdinalNr(i.getOrdinalNr());
-            ingredient.setProduct(productService.findProductById(i.getProductId()));
-            ingredient.setRecipe(recipe1);
-            ingredientList.add(ingredient);
-            ingredientService.save(ingredient);
-        }
+        convertFromDtoAndSave(recipe1, ingredientDtos, ingredientList);
 
         return ResponseEntity.ok(recipe1);
     }
@@ -99,7 +91,7 @@ public class RecipeController {
     public ResponseEntity<?> uploadImage (
             @ModelAttribute ImageRequestBody imageRequestBody
     ) {
-        String fileName = imageRequestBody.getRecipeImage().getOriginalFilename();
+        String fileName = UUID.randomUUID() + "." + imageRequestBody.getRecipeImage().getOriginalFilename();
         try {
             File file = new File(UPLOAD_PATH);
             String absolutePath = file.getAbsolutePath();
@@ -147,16 +139,7 @@ public class RecipeController {
         List<IngredientDto> ingredientDtos = recipeDTO.getIngredients();
         List<Ingredient> ingredientList = new ArrayList<>();
 
-        for(IngredientDto i : ingredientDtos){
-            Ingredient ingredient = new Ingredient();
-            ingredient.setQuantity(i.getQuantity());
-            ingredient.setUnit(unitService.findUnitById(i.getUnitId()));
-            ingredient.setOrdinalNr(i.getOrdinalNr());
-            ingredient.setProduct(productService.findProductById(i.getProductId()));
-            ingredient.setRecipe(recipe);
-            ingredientList.add(ingredient);
-            ingredientService.save(ingredient);
-        }
+        convertFromDtoAndSave(recipe, ingredientDtos, ingredientList);
 
         recipe.setIngredients(ingredientList);
         recipe.setCalories(recipeDTO.getCalories());
@@ -168,6 +151,19 @@ public class RecipeController {
         recipe.setIsVisible(recipeDTO.getIsVisible());
         recipe.setOrdinalNr(recipeDTO.getOrdinalNr());
         return ResponseEntity.ok(recipeService.save(recipe));
+    }
+
+    private void convertFromDtoAndSave(Recipe recipe, List<IngredientDto> ingredientDtos, List<Ingredient> ingredientList) {
+        for(IngredientDto i : ingredientDtos){
+            Ingredient ingredient = new Ingredient();
+            ingredient.setQuantity(i.getQuantity());
+            ingredient.setUnit(unitService.findUnitById(i.getUnitId()));
+            ingredient.setOrdinalNr(i.getOrdinalNr());
+            ingredient.setProduct(productService.findProductById(i.getProductId()));
+            ingredient.setRecipe(recipe);
+            ingredientList.add(ingredient);
+            ingredientService.save(ingredient);
+        }
     }
 
     @PostMapping(value="", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
