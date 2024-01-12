@@ -139,10 +139,26 @@ public class RecipeController {
              @RequestBody RecipeDto recipeDTO
     ) {
         Recipe recipe = recipeService.findRecipeById(recipeDTO.getRecipeId()).orElseThrow();
+
         for(Ingredient ingredient : recipe.getIngredients()){
-            ingredientService.deleteRecipeById(ingredient.getId());
+            ingredientService.delete(ingredient);
         }
-        //recipe.setIngredients(recipeDTO.getIngredients());
+
+        List<IngredientDto> ingredientDtos = recipeDTO.getIngredients();
+        List<Ingredient> ingredientList = new ArrayList<>();
+
+        for(IngredientDto i : ingredientDtos){
+            Ingredient ingredient = new Ingredient();
+            ingredient.setQuantity(i.getQuantity());
+            ingredient.setUnit(unitService.findUnitById(i.getUnitId()));
+            ingredient.setOrdinalNr(i.getOrdinalNr());
+            ingredient.setProduct(productService.findProductById(i.getProductId()));
+            ingredient.setRecipe(recipe);
+            ingredientList.add(ingredient);
+            ingredientService.save(ingredient);
+        }
+
+        recipe.setIngredients(ingredientList);
         recipe.setCalories(recipeDTO.getCalories());
         recipe.setTitle(recipeDTO.getTitle());
         recipe.setDescription(recipeDTO.getDescription());
@@ -158,7 +174,6 @@ public class RecipeController {
     public ResponseEntity<List<RecipeDto>> getAllRecipes (
             @RequestBody RecipeByTitleAndCategoryIdRequest recipeByTitleAndCategoryIdRequest
     ) throws IOException {
-        // dodac categoryId
         List<Recipe> recipes;
         final String authHeader = request.getHeader("Authorization");
         String jwt = authHeader.substring(7);
@@ -193,7 +208,7 @@ public class RecipeController {
         String absolutePath = fileTmp.getAbsolutePath();
         for (Recipe recipe : recipes) {
             String base64Image;
-            if(!recipe.getPathToImage().isEmpty() && recipe.getPathToImage() != null){
+            if(recipe.getPathToImage() != null && !recipe.getPathToImage().isEmpty()){
                 File file = new File(absolutePath + "/" + recipe.getPathToImage());
                 FileInputStream fileInputStream = new FileInputStream(file);
                 byte[] bytes = new byte[(int) file.length()];

@@ -11,4 +11,6 @@ public interface IngredientService {
     Ingredient save(Ingredient ingredient);
 
     List<Ingredient> findAllByRecipe(Recipe recipe);
+
+    void delete(Ingredient ingredient);
 }
