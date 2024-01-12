@@ -96,7 +96,7 @@ public class RecipeController {
         try {
             File file = new File(UPLOAD_PATH);
             String absolutePath = file.getAbsolutePath();
-            imageRequestBody.getRecipeImage().transferTo(new File(absolutePath + "/" + fileName));
+            imageRequestBody.getRecipeImage().transferTo(new File(absolutePath + "\\" + fileName));
             Recipe recipe = recipeService.findRecipeById(imageRequestBody.getRecipeId()).orElseThrow();
             recipe.setPathToImage(fileName);
             recipeService.save(recipe);
@@ -150,7 +150,6 @@ public class RecipeController {
 
         convertFromDtoAndSave(recipe, ingredientDtos, ingredientList);
 
-        recipe.setIngredients(ingredientList);
         recipe.setCalories(recipeDTO.getCalories());
         recipe.setTitle(recipeDTO.getTitle());
         recipe.setDescription(recipeDTO.getDescription());
@@ -158,7 +157,6 @@ public class RecipeController {
         recipe.setEditedDate(LocalDateTime.now());
         recipe.setCategoryId(recipeDTO.getCategoryId());
         recipe.setIsVisible(recipeDTO.getIsVisible());
-        recipe.setOrdinalNr(recipeDTO.getOrdinalNr());
         return ResponseEntity.ok(recipeService.save(recipe));
     }
 
@@ -205,6 +203,8 @@ public class RecipeController {
     @GetMapping("/{recipeId}")
     public ResponseEntity<?> getAllRecipesByRecipeId(@PathVariable long recipeId) throws IOException {
         if(recipeService.findRecipeById(recipeId).isPresent()){
+            var lol = recipeService.findRecipeById(recipeId).get();
+
             return ResponseEntity.ok(recipeService.findRecipeById(recipeId).get());
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recipe with id: " + recipeId + " not found");
@@ -230,7 +230,7 @@ public class RecipeController {
         for (Recipe recipe : recipes) {
             String base64Image;
             if(recipe.getPathToImage() != null && !recipe.getPathToImage().isEmpty()){
-                File file = new File(absolutePath + "/" + recipe.getPathToImage());
+                File file = new File(absolutePath + "\\" + recipe.getPathToImage());
                 FileInputStream fileInputStream = new FileInputStream(file);
                 byte[] bytes = new byte[(int) file.length()];
                 fileInputStream.read(bytes);

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import { useTranslation }  from "react-i18next";
 import { useRouter } from 'next/navigation';
@@ -28,62 +28,156 @@ const states = [
   }
 ];
 
-export const AccountProfileDetails = ({maxLength}) => {
+export const AccountProfileDetails = ({parentProps}) => {
   const { i18n, t } = useTranslation();
 const router = useRouter();
   
+console.log(parentProps.router.query)
+
+
   const [values, setValues] = useState({
     name: '',
     isVisible: true
   });
 
+
+
+  async function fetchCategory() {
+    if(parentProps.router.query.categoryId === undefined)
+    return;
+
+      var options = {  
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+        }
+      }
+  
+      const urll = 'http://localhost:8080/api/admin/categories/'+parentProps.router.query.categoryId
+       var response = await fetch(urll, options)
+      var existingCategory = await response.json()
+      setValues(
+        {
+          categoryId: parentProps.router.query.categoryId,
+          name: existingCategory.name,
+          isVisible: true
+        }
+      )
+  }
+
+  useEffect(() => {
+    fetchCategory();
+
+}, []);
+
+
   const handleChange = 
     (event) => {
+
+      var val = event.target.value
+      if(event.target.name == 'isVisible')
+        val = event.target.checked;
+
       setValues((prevState) => ({
         ...prevState,
-        [event.target.name]: event.target.value
+        [event.target.name]: val
       }));
     }
 
   const  handleSubmit = 
   async (event) => {
-      event.preventDefault();
-      console.log(values)
-      if(values.name.length ==0)
-      {
-        alert(t("error-category-name"))
-        return;
+    if(parentProps.router.query.categoryId === undefined)
+    {
+          event.preventDefault();
+          console.log(values)
+          if(values.name.length ==0)
+          {
+            alert(t("error-category-name"))
+            return;
+          }
+          var userData = JSON.parse(localStorage.getItem('authenticated_user'))
+
+          var categoryDto = {
+            name : values.name,
+            isVisible: values.isVisible ? 1 :0,
+            ordinalNr: parentProps.router.query.maxOrdinal,
+            createdByUserId: userData.id
+          }
+          console.log(categoryDto)
+          const URL = 'http://localhost:8080/api/admin/categories/add'
+    
+        var options = {  
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization':  'Bearer ' + window.sessionStorage.getItem('token') 
+          },
+          body : JSON.stringify(categoryDto)
+        }
+        console.log(options)
+
+        var response = await fetch(URL,options);
+
+        if(response.status === 200)
+          router.push('/categories')
+        else{
+          alert(await response.text())
+        }
       }
-      var userData = JSON.parse(localStorage.getItem('authenticated_user'))
+      else{
+        console.log('there is else')
+        event.preventDefault();
+        console.log(values)
+        if(values.name.length ==0)
+        {
+          alert(t("error-category-name"))
+          return;
+        }
 
-      var categoryDto = {
-        name : values.name,
-        isVisible: values.isVisible ? 1 :0,
-        ordinalNr: maxLength,
-        createdByUserId: userData.id
+        var userData = JSON.parse(localStorage.getItem('authenticated_user'))
+console.log('categoryDTO')
+        var categoryDto = {
+          categoryId: values.categoryId,
+          name : values.name,
+          isVisible: values.isVisible ? 1 :0,
+          ordinalNr: 0,
+          createdByUserId: userData.id
+        }
+
+        console.log(categoryDto)
+        const URL = 'http://localhost:8080/api/admin/categories/edit'
+  
+      var options = {  
+        method: 'PUT',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization':  'Bearer ' + window.sessionStorage.getItem('token') 
+        },
+        body : JSON.stringify(categoryDto)
       }
-      console.log(categoryDto)
-      const URL = 'http://localhost:8080/api/admin/categories/add'
- 
-    var options = {  
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization':  'Bearer ' + window.sessionStorage.getItem('token') 
-      },
-      body : JSON.stringify(categoryDto)
-    }
-    console.log(options)
+      console.log(options)
 
-    var response = await fetch(URL,options);
+      var response = await fetch(URL,options);
+      console.log(response)
 
-    if(response.status === 200)
-      router.push('/categories')
-    else{
-      alert(await response.text())
+      if(response.status === 200)
+        router.push('/categories')
+      else{
+        alert(await response.text())
+      }
+
+      }
     }
-    }
+
+
+
+
+
+
 
   return (
     <form
@@ -93,8 +187,8 @@ const router = useRouter();
     >
       <Card>
       <CardHeader
-          title={t("add")}
-        />
+          title={  parentProps.router.query.categoryId === undefined ?  t("add") : t("edit")}
+          />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
             <Grid

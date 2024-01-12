@@ -268,6 +268,16 @@ function goToAddForm()
     enableRowActions: true,
     renderRowActionMenuItems: ({ row }) => [
       <MenuItem key="edit" onClick={() => {
+   
+        console.log(sbValue);
+      router.push({
+        pathname: '/forms/recipe/add',
+        query: { maxOrdinal: data.length == 0 ? 0: data[data.length-1].ordinalNr,
+                categoryId: row.original.categoryId,
+                recipeId: row.original.recipeId
+         }
+    }, '/forms/recipe/add')
+        
       }
       }>
         {t("edit")}

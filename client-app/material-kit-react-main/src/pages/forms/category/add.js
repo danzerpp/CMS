@@ -11,7 +11,8 @@ import {
 import { useRouter } from 'next/navigation';
 const Page = (props) =>{
     const {t} = useTranslation();
-    console.log(props.router.query.maxOrdinal);
+    console.log('params');
+    console.log(props.router.query.categoryId);
     const router = useRouter();
 
     function goBackToPage()
@@ -59,7 +60,7 @@ return(
                 md={6}
                 lg={8}
               >
-                <AccountProfileDetails maxLength = {props.router.query.maxOrdinal} />
+                <AccountProfileDetails parentProps = {props} />
               </Grid>
             </Grid>
           </div>

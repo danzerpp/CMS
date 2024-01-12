@@ -31,4 +31,4 @@ application:
       secret-key: ef17bc67e97b035b5a910411dfe24aa1669286320fc00bfa74fe667ac910bd3f
 
 image:
-  folder: backend-api/culinaryBlogApi/src/main/resources/static/image/
+  folder: culinaryBlogApi\src\main\resources\static\image\

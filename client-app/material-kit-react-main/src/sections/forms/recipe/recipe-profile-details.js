@@ -43,7 +43,7 @@ const states = [
   }
 ];
 
-export const RecipeProfileDetails = ({file,maxOrdinal,currCatId}) => {
+export const RecipeProfileDetails = ({file,maxOrdinal,currCatId, parentProps}) => {
   const { i18n, t } = useTranslation();
   const [sbData, setsbData] = useState([]);
   const [sbValue, setsbValue] = useState(0);
@@ -61,18 +61,76 @@ export const RecipeProfileDetails = ({file,maxOrdinal,currCatId}) => {
 
 const [ingredients, setIngredients] = useState(
   [
-    {
-      productId:1,
-      unitId:1,
-      quantity:10
-    },
-    {
-      productId:2,
-      unitId:2,
-      quantity:12
-    }
+   
   ]
 )
+
+
+
+
+async function fetchRecipe() {
+  console.log('haha')
+  console.log(parentProps.router.query.recipeId)
+  if(parentProps.router.query.recipeId === undefined)
+  return;
+  var options = {  
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':  'Bearer ' + window.localStorage.getItem('token') ,
+    },
+    body: JSON.stringify(
+      {
+        title: "",
+        'categoryId':parentProps.router.query.categoryId
+      }
+    )
+
+  }
+
+  var urlFetch = 'http://localhost:8080/api/admin/recipes'
+  var response = await fetch(urlFetch, options)
+  console.log(response)
+  var bodyData = await response.json()
+  console.log(bodyData)
+  console.log(parentProps.router.query.recipeId)
+  var result = bodyData.find(f=>f.recipeId == parentProps.router.query.recipeId)
+  console.log('details')
+  console.log(result)
+
+ setValues({
+  recipeId: result.recipeId,
+    title: result.title,
+    description: result.description,
+    calories: result.calories,
+    categoryId: result.categoryId,
+    isVisible: true
+  });
+
+  var ingredientsDto = []
+  for (let i = 0; i < result.ingredients.length; i++) {
+    const ingredient = result.ingredients[i];
+
+    ingredientsDto.push({
+      productId: ingredient.productId,
+      unitId: ingredient.unitId,
+      quantity: ingredient.quantity,
+    })
+
+  }
+
+  setIngredients(ingredientsDto)
+}
+
+
+
+
+useEffect(() => {
+  fetchRecipe();
+
+}, []);
+
 
 
  
@@ -168,7 +226,6 @@ const table = useMaterialReactTable({
   enableRowOrdering:true,
   enableRowActions: true,
   enableEditing:true,
-  
    data:ingredients,
    columns,localization: {
     actions: t("actions"),
@@ -293,6 +350,103 @@ const table = useMaterialReactTable({
 
   const handleSubmit = 
     async(event) => {
+      if(parentProps.router.query.recipeId === undefined)
+      {
+
+            event.preventDefault();
+            console.log(values);
+            if(file === undefined){
+              alert(t('choose-file'))
+              return;
+            }  
+            
+            if(values.title.length ===0){
+              alert(t('set-title'))
+              return;
+            }   
+
+            if(values.description.length ===0){
+              alert(t('set-description'))
+              return;
+            }   
+
+          
+          if(ingredients.length ===0)
+          {
+            alert(t('set-ingredients'))
+              return;
+          }
+          
+      
+
+            var userData = JSON.parse(localStorage.getItem('authenticated_user'))
+
+            console.log(ingredients)
+            var ingredientDtos = []
+            for (let i = 0; i < ingredients.length; i++) {
+              var ingredient = ingredients[i];
+              ingredientDtos.push({
+                "productId": ingredient.productId,
+                "unitId": ingredient.unitId,
+                "quantity": ingredient.quantity,
+                "ordinalNr": i
+              })
+              
+            }
+
+      var recipeDto = {
+        "categoryId": parseInt(currCatId),
+        "ordinalNr": maxOrdinal,
+        "title": values.title,
+        "description": values.description,
+        "calories": values.calories,
+        "actionUserId": userData.id,
+        "isVisible": values.isVisible? 1 :0,
+        "ingredients": ingredientDtos
+      }
+
+
+            var url = 'http://localhost:8080/api/admin/recipes/add'
+      
+            var options = {  
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':  'Bearer ' + window.sessionStorage.getItem('token') 
+              },
+              body : JSON.stringify(recipeDto)
+            }
+        
+            var response = await fetch(url,options);
+            var resultBodyRecipe = await response.json();
+            console.log('return body')
+            console.log(resultBodyRecipe)
+
+
+
+
+
+            const data = new FormData();
+            data.append("recipeId", resultBodyRecipe.id);
+            data.append("recipeImage", file);
+
+            var urlUpload = 'http://localhost:8080/api/admin/recipes/uploadImage'
+        
+            var options = {  
+              method: 'POST',
+              headers: {
+                'Authorization':  'Bearer ' +window.sessionStorage.getItem('token') 
+              },
+              body : data
+            }
+        
+            var response = await fetch(urlUpload,options);
+          
+            router.push('/recipes')
+
+    }
+    else{
       event.preventDefault();
       console.log(values);
       if(file === undefined){
@@ -317,7 +471,7 @@ const table = useMaterialReactTable({
         return;
     }
     
- 
+
 
       var userData = JSON.parse(localStorage.getItem('authenticated_user'))
 
@@ -335,7 +489,8 @@ const table = useMaterialReactTable({
       }
 
 var recipeDto = {
-  "categoryId": parseInt(currCatId),
+  recipeId: values.recipeId,
+  "categoryId": values.categoryId,
   "ordinalNr": maxOrdinal,
   "title": values.title,
   "description": values.description,
@@ -344,10 +499,11 @@ var recipeDto = {
   "isVisible": values.isVisible? 1 :0,
   "ingredients": ingredientDtos
 }
+console.log('edit')
+console.log(recipeDto)
 
+      var url = 'http://localhost:8080/api/admin/recipes/edit'
 
-      var url = 'http://localhost:8080/api/admin/recipes/add'
- 
       var options = {  
         method: 'POST',
         headers: {
@@ -372,7 +528,7 @@ var recipeDto = {
       data.append("recipeImage", file);
 
       var urlUpload = 'http://localhost:8080/api/admin/recipes/uploadImage'
-   
+  
       var options = {  
         method: 'POST',
         headers: {
@@ -382,8 +538,12 @@ var recipeDto = {
       }
   
       var response = await fetch(urlUpload,options);
-     
+    
       router.push('/recipes')
+
+    }
+
+
     }
 
   return (
@@ -393,7 +553,9 @@ var recipeDto = {
       onSubmit={handleSubmit}
     >
       <Card>
-        
+      <CardHeader
+          title={  parentProps.router.query.recipeId === undefined ?  t("add") : t("edit")}
+        />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
             <Grid

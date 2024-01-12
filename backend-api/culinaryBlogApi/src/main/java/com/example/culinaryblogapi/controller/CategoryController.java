@@ -85,8 +85,7 @@ public class CategoryController {
     ) {
         Category category = categoryService.findCategoryById(categoryDto.getCategoryId());
         if(category != null){
-            category.setName(category.getName());
-            category.setOrdinalNr(categoryDto.getOrdinalNr());
+            category.setName(categoryDto.getName());
             category.setIsVisible(categoryDto.getIsVisible());
             return ResponseEntity.ok(categoryService.save(category));
         } else {
@@ -99,7 +98,6 @@ public class CategoryController {
         List<Category> categories = categoryService.getAll();
         List<CategoryDto> categoryDtos = categories.stream()
                 .map(this::convertToDto)
-                .filter(c -> c.getIsVisible() == 1)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(categoryDtos);
     }

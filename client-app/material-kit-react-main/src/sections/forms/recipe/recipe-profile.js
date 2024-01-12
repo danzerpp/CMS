@@ -1,6 +1,6 @@
 import { useTranslation }  from "react-i18next";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Avatar,
   Box,
@@ -21,15 +21,15 @@ const user = {
   timezone: 'GTM-7'
 };
 import i18n from "i18next";
+import { ConstructionOutlined } from "@mui/icons-material";
 
-export const RecipeProfile = ({ handleUpload }) =>{ 
+export const RecipeProfile = ({ handleUpload, parentProps }) =>{ 
   
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [file, setFile] = useState("");
   const [fileToView, setFileToView] = useState();
-
   function handleForm(e) {
     console.log(e)
     e.preventDefault();
@@ -46,6 +46,55 @@ export const RecipeProfile = ({ handleUpload }) =>{
     //   body: data,
     // });
   }
+
+
+  async function fetchRecipe() {
+if(parentProps.router.query.recipeId === undefined)
+      return;
+      var options = {  
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization':  'Bearer ' + window.localStorage.getItem('token') ,
+        },
+        body: JSON.stringify(
+          {
+            title: "",
+            'categoryId':parentProps.router.query.categoryId
+          }
+        )
+    
+      }
+    
+      var urlFetch = 'http://localhost:8080/api/admin/recipes'
+      var response = await fetch(urlFetch, options)
+      console.log(response)
+      var bodyData = await response.json()
+      console.log(bodyData)
+      console.log(parentProps.router.query.recipeId)
+      var result = bodyData.find(f=>f.recipeId == parentProps.router.query.recipeId)
+      console.log(result)
+
+     var srcImage = "data:image/png;base64, "+ result.image
+     fetch(srcImage)
+     .then(res => res.blob())
+     .then(blob => {
+       const file = new File([blob], "File name",{ type: "image/png" })
+       console.log(file)
+       setFile(file);
+       handleUpload(file);
+       setFileToView(URL.createObjectURL(file))
+     })
+
+  };
+
+
+  useEffect(() => {
+    fetchRecipe();
+  
+}, []);
+
 
   function handleFileChange(e) {
     if (e.target.files && e.target.files[0]) 

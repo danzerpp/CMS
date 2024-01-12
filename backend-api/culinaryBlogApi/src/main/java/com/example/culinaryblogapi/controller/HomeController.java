@@ -125,7 +125,7 @@ public class HomeController {
 
         String base64Image;
         if (recipe.getPathToImage() != null && !recipe.getPathToImage().isEmpty()) {
-            File file = new File(absolutePath + "/" + recipe.getPathToImage());
+            File file = new File(absolutePath + "\\" + recipe.getPathToImage());
             FileInputStream fileInputStream = new FileInputStream(file);
             byte[] bytes = new byte[(int) file.length()];
             fileInputStream.read(bytes);

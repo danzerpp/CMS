@@ -13,7 +13,10 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 const Page = (props) =>{
     const {t} = useTranslation();
+    console.log('props');
     console.log(props.router.query.maxOrdinal);
+    console.log(props.router.query.categoryId);
+    console.log(props.router.query.recipeId);
     const router = useRouter();
 
     const [file, setFile] = useState();
@@ -73,7 +76,8 @@ return(
                 lg={4}
               >
                 <RecipeProfile
-                 handleUpload = {setFormImage} />
+                 handleUpload = {setFormImage} 
+                 parentProps = {props}     />
               </Grid>
               <Grid
                 xs={12}
@@ -81,7 +85,7 @@ return(
                 lg={8}
               >
                 <RecipeProfileDetails
-                file = {file} maxOrdinal = {props.router.query.maxOrdinal} currCatId = {props.router.query.categoryId}
+                file = {file} maxOrdinal = {props.router.query.maxOrdinal} currCatId = {props.router.query.categoryId} parentProps = {props}  
                 />
               </Grid>
             </Grid>
