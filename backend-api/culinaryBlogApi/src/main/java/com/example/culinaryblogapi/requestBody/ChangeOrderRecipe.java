@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangeOrderRecipe {
-    String recipeId;
+    long recipeId;
     int ordinalNr;
 }

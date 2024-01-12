@@ -6,6 +6,7 @@ import com.example.culinaryblogapi.dto.RecipeDto;
 import com.example.culinaryblogapi.model.Ingredient;
 import com.example.culinaryblogapi.model.Recipe;
 import com.example.culinaryblogapi.model.User;
+import com.example.culinaryblogapi.requestBody.ChangeOrderRecipe;
 import com.example.culinaryblogapi.requestBody.ImageRequestBody;
 import com.example.culinaryblogapi.requestBody.RecipeByTitleAndCategoryIdRequest;
 import com.example.culinaryblogapi.service.*;
@@ -208,6 +209,18 @@ public class RecipeController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Recipe with id: " + recipeId + " not found");
         }
+    }
+
+    @PostMapping("/changeOrder")
+    public ResponseEntity<?> changeOrder (
+            @RequestBody List<ChangeOrderRecipe> changeOrderRecipes
+    ) {
+        for (ChangeOrderRecipe order : changeOrderRecipes) {
+            Recipe recipe = recipeService.findRecipeById(order.getRecipeId()).get();
+            recipe.setOrdinalNr(order.getOrdinalNr());
+            recipeService.save(recipe);
+        }
+        return ResponseEntity.ok("reorderd");
     }
 
     public List<RecipeDto> convertRecipeToDTO(List<Recipe> recipes) throws IOException {
