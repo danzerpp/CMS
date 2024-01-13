@@ -87,6 +87,24 @@ const Page = () => {
     console.log(resultList)
     if(resultList.length >0)
     {
+      var usedCategory = localStorage.getItem('last_used_category')
+      console.log('usedCategory')
+      console.log(usedCategory)
+      if(usedCategory !== undefined && usedCategory !== null)
+      {
+      
+          var value = resultList.find(f=>f.value === parseInt(usedCategory))
+          console.log(resultList)
+          console.log(value)
+          if(value !== undefined)
+        {
+          console.log('setsbValue')
+          console.log(value)
+          setsbValue(parseInt(usedCategory))
+          fetchRecipes(parseInt(usedCategory))
+          return;
+        }
+      }
       setsbValue(resultList[0].value)
       fetchRecipes(resultList[0].value)
     }
@@ -175,6 +193,7 @@ function goToAddForm()
 {
   if(sbValue ===0 )
     return;
+    localStorage.setItem('last_used_category',sbValue)
     console.log(sbValue);
   router.push({
     pathname: '/forms/recipe/add',
@@ -268,8 +287,7 @@ function goToAddForm()
     enableRowActions: true,
     renderRowActionMenuItems: ({ row }) => [
       <MenuItem key="edit" onClick={() => {
-   
-        console.log(sbValue);
+        localStorage.setItem('last_used_category',row.original.categoryId)
       router.push({
         pathname: '/forms/recipe/add',
         query: { maxOrdinal: data.length == 0 ? 0: data[data.length-1].ordinalNr,

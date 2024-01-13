@@ -62,7 +62,7 @@ console.log(parentProps.router.query)
         {
           categoryId: parentProps.router.query.categoryId,
           name: existingCategory.name,
-          isVisible: true
+          isVisible: existingCategory.isVisible
         }
       )
   }

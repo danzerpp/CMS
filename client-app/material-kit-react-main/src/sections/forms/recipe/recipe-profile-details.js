@@ -395,7 +395,7 @@ const table = useMaterialReactTable({
             }
 
       var recipeDto = {
-        "categoryId": parseInt(currCatId),
+        "categoryId": values.categoryId,
         "ordinalNr": maxOrdinal,
         "title": values.title,
         "description": values.description,
@@ -404,6 +404,7 @@ const table = useMaterialReactTable({
         "isVisible": values.isVisible? 1 :0,
         "ingredients": ingredientDtos
       }
+      localStorage.setItem('last_used_category',values.categoryId)
 
 
             var url = 'http://localhost:8080/api/admin/recipes/add'
@@ -499,8 +500,7 @@ var recipeDto = {
   "isVisible": values.isVisible? 1 :0,
   "ingredients": ingredientDtos
 }
-console.log('edit')
-console.log(recipeDto)
+
 
       var url = 'http://localhost:8080/api/admin/recipes/edit'
 
@@ -513,6 +513,7 @@ console.log(recipeDto)
         },
         body : JSON.stringify(recipeDto)
       }
+      localStorage.setItem('last_used_category',values.categoryId)
   
       var response = await fetch(url,options);
       var resultBodyRecipe = await response.json();

@@ -197,7 +197,7 @@ public class RecipeController {
                                         : recipeService.findAllByTitleContainingIgnoreCaseAndCreatedByUserIdAndCategoryId(recipeByTitleAndCategoryIdRequest.getTitle(), user, recipeByTitleAndCategoryIdRequest.getCategoryId());
         }
 
-        return ResponseEntity.ok(convertRecipeToDTO(recipes.stream().filter(r -> r.getIsVisible() == 1).collect(Collectors.toList())));
+        return ResponseEntity.ok(convertRecipeToDTO(recipes));
     }
 
     @GetMapping("/{recipeId}")
@@ -263,9 +263,7 @@ public class RecipeController {
                     .image(base64Image)
                     .build();
 
-            if(recipe.getIsVisible() == 1){
                 recipeDtos.add(recipeDTO);
-            }
         }
         return recipeDtos;
     }
