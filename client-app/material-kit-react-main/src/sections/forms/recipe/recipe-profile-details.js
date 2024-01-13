@@ -647,7 +647,7 @@ console.log(recipeDto)
                   onChange={handleChange}
                   required
                   multiline
-  rows={2}
+  rows={8}
   maxRows={4}
   value={values.description}
                 >

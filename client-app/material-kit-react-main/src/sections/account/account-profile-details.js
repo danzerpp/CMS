@@ -30,10 +30,10 @@ const states = [
 export const AccountProfileDetails = ({parentProps}) => {
   const { i18n, t } = useTranslation();
   const [values, setValues] = useState({
-    fullname: 'sdfsfs',
-    password: 'sss',
-    email: 'sdfsdfsd',
-    role: 2
+    fullname: '',
+    password: '',
+    email: '',
+    role: 1
   });
 
   const router = useRouter();
@@ -249,9 +249,7 @@ var data = {}
                   fullWidth
                   label={t("address-email")}
                   name="email"
-                  inputProps={
-                    { readOnly: true, }
-                  }
+                
                   type='email'
                   onChange={handleChange}
                   required
