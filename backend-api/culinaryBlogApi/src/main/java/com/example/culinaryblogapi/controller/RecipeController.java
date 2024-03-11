@@ -10,13 +10,13 @@ import com.example.culinaryblogapi.requestBody.ChangeOrderRecipe;
 import com.example.culinaryblogapi.requestBody.ImageRequestBody;
 import com.example.culinaryblogapi.requestBody.RecipeByTitleAndCategoryIdRequest;
 import com.example.culinaryblogapi.service.*;
+import com.example.culinaryblogapi.utils.FileUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,13 +32,14 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/recipes")
 @RequiredArgsConstructor
 public class RecipeController {
 
+    public static final int MIN_SIZE_OF_IMAGE = 100000;
+    public static final int MAX_SIZE_OF_IAMGE = 5000000;
     @Autowired
     private HttpServletRequest request;
 
@@ -96,18 +97,31 @@ public class RecipeController {
         try {
             File file = new File(UPLOAD_PATH);
             String absolutePath = file.getAbsolutePath();
-            imageRequestBody.getRecipeImage().transferTo(new File(absolutePath + "\\" + fileName));
-            Recipe recipe = recipeService.findRecipeById(imageRequestBody.getRecipeId()).orElseThrow();
-            recipe.setPathToImage(fileName);
-            recipeService.save(recipe);
-            return ResponseEntity.ok("File uploaded successfully.");
+            String mimeTypeOfImage = FileUtils.getRealMimeType(imageRequestBody.getRecipeImage());
+            long sizeOfFile = imageRequestBody.getRecipeImage().getSize();
+            if(mimeTypeOfImage.equals("image/jpg") || mimeTypeOfImage.equals("image/jpeg") ){
+                if(sizeOfFile < MIN_SIZE_OF_IMAGE || sizeOfFile > MAX_SIZE_OF_IAMGE) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                            sizeOfFile < MIN_SIZE_OF_IMAGE ?
+                                    "Size of image is too small"
+                                    : "Size of image is too large."
+                    );
+                } else {
+                    imageRequestBody.getRecipeImage().transferTo(new File(absolutePath + "\\" + fileName));
+                    Recipe recipe = recipeService.findRecipeById(imageRequestBody.getRecipeId()).orElseThrow();
+                    recipe.setPathToImage(fileName);
+                    recipeService.save(recipe);
+                    return ResponseEntity.ok("File uploaded successfully.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not supported extension of image. Allowed extension is jpg or jpeg.");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping(value ="/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value ="/image/{imageName}", produces = org.springframework.http.MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<ByteArrayResource> getImageForRecipe (
             @PathVariable String imageName
     ) throws IOException {
@@ -173,7 +187,7 @@ public class RecipeController {
         }
     }
 
-    @PostMapping(value="", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value="", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE, consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RecipeDto>> getAllRecipes (
             @RequestBody RecipeByTitleAndCategoryIdRequest recipeByTitleAndCategoryIdRequest
     ) throws IOException {

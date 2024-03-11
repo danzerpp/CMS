@@ -45,6 +45,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/v1/auth/register").hasAuthority("ADMIN")
                                 .requestMatchers("/api/admin/users/**").hasAuthority("ADMIN")
                                 .requestMatchers("/api/admin/categories/**").hasAnyAuthority("ADMIN", "CHEF")
+                                .requestMatchers("/api/admin/recipes/changeOrder").hasAnyAuthority("ADMIN")
                                 .requestMatchers("/api/admin/recipes/**").hasAnyAuthority("ADMIN", "CHEF")
                                 .requestMatchers("/api/admin/units/**").hasAnyAuthority("ADMIN", "CHEF")
                                 .requestMatchers("/api/admin/ingredients/**").hasAnyAuthority("ADMIN", "CHEF")
