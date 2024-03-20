@@ -47,3 +47,6 @@ In system are two dashboard, the first is for admins and cooker to mange recipes
 ![Zrzut ekranu 2024-03-20 o 12 47 32](https://github.com/KacperC948/CMS/assets/59024079/1dc88d98-ed12-4da7-96e2-3b1cad5d888b)
 ![Zrzut ekranu 2024-03-20 o 12 57 50](https://github.com/KacperC948/CMS/assets/59024079/a38b5b55-7d4e-428a-94e9-ddf7d6fafefa)
 
+#Public dashboard for user for browse recipes
+![Zrzut ekranu 2024-03-20 o 12 58 39](https://github.com/KacperC948/CMS/assets/59024079/f0f9043b-ad43-47d4-a285-9253d999a6f2)
+![Zrzut ekranu 2024-03-20 o 12 58 52](https://github.com/KacperC948/CMS/assets/59024079/cb1de8c9-30e5-44d8-88d1-2fd5a6c7f165)
