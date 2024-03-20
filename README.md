@@ -1,5 +1,11 @@
-Current endpoints:
-![Zrzut ekranu 2023-12-19 o 21 29 44](https://github.com/danzerpp/CMS/assets/59024079/60eaa0e5-e99e-4c00-b0ae-f46ff9c53f5e)
+**CMS System for manage recipes and building layout for user page**
+
+**Introduction**
+
+The aim of project is to manage recipes created by admins or cookers and publishing them to public website sorted and assigned to proper category. There are 3 roles in system - admin, cooker and user. Division of possible method used by proper role is listed below. 
+
+In system are two dashboard, the first is for admins and cooker to mange recipes and the second is for user to visit website and browse all created recipes by admins and cookers.
+
 
 **Endpoints for admin:**
 - POST /api/admin/users/add - Adds a new user.
