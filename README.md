@@ -9,6 +9,7 @@ In system are two dashboard, the first is for admins and cooker to mange recipes
 **Technology stack:**
 - Java, Spring Boot for Backend
 - React, NextJs for Frontend
+- PostreSQL 
 
 **Endpoints for admin:**
 - POST /api/admin/users/add - Adds a new user.
