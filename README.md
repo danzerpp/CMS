@@ -1,4 +1,4 @@
-***CMS System for manage recipes and building layout for user page***
+**CMS System for manage recipes and building layout for user page**
 
 **Introduction**
 
@@ -6,6 +6,9 @@ The aim of project is to manage recipes created by admins or cookers and publish
 
 In system are two dashboard, the first is for admins and cooker to mange recipes and the second is for user to visit website and browse all created recipes by admins and cookers.
 
+**Technology stack:**
+- Java, Spring Boot for Backend
+- React, NextJs for Frontend
 
 **Endpoints for admin:**
 - POST /api/admin/users/add - Adds a new user.
