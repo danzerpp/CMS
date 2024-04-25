@@ -1,5 +1,9 @@
 **CMS System for manage recipes and building layout for user page**
 
+**Running the system**
+
+To run the system you have to clone project and run command "docker-compose up" in main folder of project
+
 **Introduction**
 
 The aim of project is to manage recipes created by admins or cookers and publishing them to public website sorted and assigned to proper category. There are 3 roles in system - admin, cooker and user. Division of possible method used by proper role is listed below. 
