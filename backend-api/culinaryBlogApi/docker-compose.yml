@@ -1,0 +1,20 @@
+#was used to create database
+
+services:  
+  postgres-db:
+    hostname: culinary_blog
+    ports:
+      - "5442:5432"
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: culinary_blog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: kacper
+      PGDATA: /data/postgres
+    volumes:
+      - database-culinary_blog:/data/postgres
+    restart: always
+
+
+volumes:
+  database-culinary_blog:
